@@ -1,0 +1,118 @@
+.page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.glow {
+    position: absolute;
+    top: -150px;
+    right: -150px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 80px 40px;
+    position: relative;
+    z-index: 1;
+}
+
+.heading {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.sub {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 56px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 24px;
+    align-items: center;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 36px;
+    transition: border-color 0.2s;
+}
+
+.card:hover {
+    border-color: var(--border-light);
+}
+
+.cardIcon {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cardTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.cardDesc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.joinBtn {
+    width: 100%;
+    padding: 12px 24px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.joinBtn:hover {
+    border-color: var(--accent);
+    color: var(--accent-light);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.divider span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+}
