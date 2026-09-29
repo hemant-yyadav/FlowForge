@@ -12,5 +12,6 @@ export async function handleJoinRoom(ws: WebSocket, roomId: string) {
         return;
     }
 
+    console.log(`User joining room ${roomId}`);
     joinRoom(ws, roomId);
 }

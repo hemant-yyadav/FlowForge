@@ -6,6 +6,7 @@ import { WS_URL } from "../lib/constants";
 export interface ChatMessage {
     text: string;
     own: boolean;
+    senderName?: string;
 }
 
 export function useWebSocket(token: string | null, roomId: string) {
@@ -31,7 +32,7 @@ export function useWebSocket(token: string | null, roomId: string) {
                 setError(data.message);
                 ws.close();
             } else if (data.type === "chat") {
-                setMessages((prev) => [...prev, { text: data.message, own: false }]);
+                setMessages((prev) => [...prev, { text: data.message, own: false, senderName: data.senderName }]);
             }
         };
 

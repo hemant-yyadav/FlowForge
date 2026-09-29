@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { findUser } from "./UserManager";
+import { findUser } from "./UserManager.js";
 
 export function joinRoom(ws: WebSocket, roomId: string) {
     const user = findUser(ws);
