@@ -1,43 +1,19 @@
 import express from "express";
-import jwt from "jsonwebtoken";
-import { SigninSchema, CreateRoomSchema,CreateUserSchema} from "@repo/common/src/types"
-import { middleware } from "./middleware";
+import cors from "cors";
+import router from "./routes/index.js";
+import path from "path";
+import { config } from "dotenv";
+
+config({ path: path.resolve(__dirname, "../../../.env") });
+
 const app = express();
 
-app.post('/signin',(req,res) =>{
-    const data = SigninSchema.safeParse(req.body);
-    if(!data.success){
-        res.json({
-            message : "wrong input schema"
-        })
-        return;
-    }
-    res.json({
-        userId : "sadjfkl;as"
-    })
-});
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
 
-
-app.post('/signup',(req,res) =>{
-    // @ts-ignore
-    const userId = req.userId;
-    const token = jwt.sign(userId,"sdkjfla")
-    res.json({
-        token 
-    })
-}); 
-
-app.post('/room',middleware,(req,res) =>{
-    const data = CreateRoomSchema.safeParse(req.body);
-    if(!data.success){
-        res.json({
-            message : "incorrect inputs"
-        })
-        return;
-    }
-    res.json({
-        roomId : "sdjlfa"
-    })
-});
+app.use(express.json());
+app.use(router);
 
 app.listen(3001);
