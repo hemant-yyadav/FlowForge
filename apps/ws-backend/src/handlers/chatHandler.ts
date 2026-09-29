@@ -9,9 +9,13 @@ export async function handleChat(ws: WebSocket, roomSlug: string, message: strin
 
     if (!room) return;
 
-    await prismaClient.chat.create({
-        data: { roomId: room.id, message, userId },
-    });
+    try {
+        await prismaClient.chat.create({
+            data: { roomId: room.id, message, userId },
+        });
+    } catch (e) {
+        console.error("Failed to save chat to DB:", e);
+    }
 
     const sender = findUser(ws);
     const senderName = sender?.name || "Unknown";

@@ -1,1 +1,1 @@
-{"root":["./src/roommanager.ts","./src/usermanager.ts","./src/index.ts","./src/handlers/chathandler.ts","./src/handlers/joinhandler.ts","./src/handlers/leavehandler.ts"],"version":"5.9.2"}
+{"root":["./src/roommanager.ts","./src/usermanager.ts","./src/index.ts","./src/handlers/chathandler.ts","./src/handlers/clearhandler.ts","./src/handlers/drawhandler.ts","./src/handlers/joinhandler.ts","./src/handlers/leavehandler.ts","./src/handlers/usershandler.ts"],"version":"5.9.2"}

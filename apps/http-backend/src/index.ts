@@ -9,7 +9,7 @@ config({ path: path.resolve(__dirname, "../../../.env") });
 const app = express();
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:3002"],
     credentials: true,
 }));
 

@@ -1,0 +1,147 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { HTTP_URL } from "../../../config";
+import { useWhiteboardSocket } from "../../../hooks/useWhiteboardSocket";
+import { useCanvas } from "../../../hooks/useCanvas";
+import { Toolbar } from "../../../components/Toolbar";
+import { ChatSidebar } from "../../../components/ChatSidebar";
+import { CursorOverlay } from "../../../components/CursorOverlay";
+import { LogOut } from "lucide-react";
+
+import { Suspense } from "react";
+
+function RoomCanvasInner() {
+    const params = useParams();
+    const searchParams = useSearchParams();
+    const slug = params.slug as string;
+    
+    const router = useRouter();
+    const [token, setToken] = useState<string | null>(null);
+    const [initialShapes, setInitialShapes] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let storedToken = localStorage.getItem("token");
+        const urlToken = searchParams.get("token");
+
+        if (urlToken) {
+            localStorage.setItem("token", urlToken);
+            storedToken = urlToken;
+            window.history.replaceState({}, document.title, `/room/${slug}`);
+        }
+
+        if (!storedToken) {
+            router.push("/signin");
+            return;
+        }
+        setToken(storedToken);
+
+        // Fetch initial shapes from HTTP backend
+        fetch(`${HTTP_URL}/room/${slug}/shapes`, {
+            headers: { "Authorization": `Bearer ${storedToken}` }
+        })
+        .then(res => {
+            if (res.status === 404) throw new Error("Room not found");
+            if (!res.ok) throw new Error("Failed to fetch");
+            return res.json();
+        })
+        .then(data => {
+            if (data.shapes) {
+                // Parse the stringified shape data from DB
+                const parsedShapes = data.shapes.map((s: any) => JSON.parse(s.data));
+                setInitialShapes(parsedShapes);
+            }
+            setLoading(false);
+        })
+        .catch(err => {
+            console.error("Failed to load shapes:", err);
+            setLoading(false);
+        });
+    }, [slug, searchParams, router]);
+
+    const { connected, chats, remoteShapes, remoteCursors, sendChat, sendDraw, sendCursor, sendClearBoard, clearTrigger, roomUsers } = useWhiteboardSocket(slug, token);
+    
+    useEffect(() => {
+        if (clearTrigger > 0) {
+            setInitialShapes([]);
+        }
+    }, [clearTrigger]);
+
+    const { 
+        canvasRef, 
+        onMouseDown, 
+        onMouseMove, 
+        onMouseUp, 
+        currentTool, 
+        setCurrentTool, 
+        color, 
+        setColor,
+        clearBoard
+    } = useCanvas(initialShapes, remoteShapes, sendDraw, sendCursor, sendClearBoard, () => setInitialShapes([]), clearTrigger);
+
+    if (loading) {
+        return <div style={{ display: "flex", height: "100vh", alignItems: "center", justifyContent: "center", background: "#111", color: "#fff" }}>Loading canvas...</div>;
+    }
+
+    return (
+        <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#111" }}>
+            <Toolbar currentTool={currentTool} setCurrentTool={setCurrentTool} color={color} setColor={setColor} clearBoard={clearBoard} />
+            <ChatSidebar chats={chats} sendChat={sendChat} roomUsers={roomUsers} />
+            <CursorOverlay cursors={remoteCursors} />
+            
+            <button
+                onClick={() => window.location.href = "http://localhost:3000/dashboard"}
+                style={{
+                    position: "absolute",
+                    top: 20,
+                    right: 20,
+                    background: "rgba(30, 30, 30, 0.9)",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "#fff",
+                    padding: "10px 16px",
+                    borderRadius: "12px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    zIndex: 10,
+                    fontWeight: 500,
+                    transition: "all 0.2s"
+                }}
+            >
+                <LogOut size={18} />
+                Exit Room
+            </button>
+
+            <canvas
+                ref={canvasRef}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseUp}
+                style={{
+                    display: "block",
+                    cursor: "crosshair"
+                }}
+            />
+            
+            {!connected && (
+                <div style={{ position: "absolute", bottom: 20, right: 20, background: "rgba(255,0,0,0.8)", padding: "8px 16px", borderRadius: "8px", color: "#fff", fontSize: "12px" }}>
+                    Disconnected. Trying to reconnect...
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default function RoomCanvas() {
+    return (
+        <Suspense fallback={<div style={{ display: "flex", height: "100vh", alignItems: "center", justifyContent: "center", background: "#111", color: "#fff" }}>Loading...</div>}>
+            <RoomCanvasInner />
+        </Suspense>
+    );
+}

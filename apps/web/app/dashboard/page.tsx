@@ -19,7 +19,7 @@ export default function DashboardPage() {
         e.preventDefault();
         setError("");
         setCreating(true);
-        const { error: err } = await apiRequest("/room", {
+        const { data, error: err } = await apiRequest("/room", {
             method: "POST",
             body: { name: roomName, password: "default" },
             token: token ?? "",
@@ -29,7 +29,8 @@ export default function DashboardPage() {
             setError(err);
             return;
         }
-        router.push(`/room/${roomName}`);
+        
+        window.location.href = `http://localhost:3002/room/${roomName}?token=${token}`;
     }
 
     const [joining, setJoining] = useState(false);
@@ -54,7 +55,7 @@ export default function DashboardPage() {
             return;
         }
 
-        router.push(`/room/${slug}`);
+        window.location.href = `http://localhost:3002/room/${slug}?token=${token}`;
     }
 
     if (loading || !token) return null;

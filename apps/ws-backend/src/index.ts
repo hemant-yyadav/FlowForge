@@ -4,6 +4,10 @@ import { addUser, removeUser, findUser } from "./UserManager.js";
 import { handleJoinRoom } from "./handlers/joinHandler.js";
 import { handleLeaveRoom } from "./handlers/leaveHandler.js";
 import { handleChat } from "./handlers/chatHandler.js";
+import { handleDraw } from "./handlers/drawHandler.js";
+import { handleClearBoard } from "./handlers/clearHandler.js";
+import { broadcastRoomUsers } from "./handlers/usersHandler.js";
+import { getUsersInRoom } from "./UserManager.js";
 import path from "path";
 import { config } from "dotenv";
 
@@ -63,7 +67,7 @@ wss.on("connection", async function connection(ws, request) {
         console.log("Parsed message:", parsed);
 
         if (parsed.type === "join_room") {
-            await handleJoinRoom(ws, parsed.roomId);
+            await handleJoinRoom(ws, parsed.roomId, userId);
         }
 
         if (parsed.type === "leave_room") {
@@ -73,9 +77,31 @@ wss.on("connection", async function connection(ws, request) {
         if (parsed.type === "chat") {
             await handleChat(ws, parsed.roomId, parsed.message, userId);
         }
+
+        if (parsed.type === "draw") {
+            await handleDraw(ws, parsed.roomId, parsed.shape, userId);
+        }
+
+        if (parsed.type === "clear_board") {
+            await handleClearBoard(ws, parsed.roomId, userId);
+        }
+
+        if (parsed.type === "cursor") {
+            const usersInRoom = getUsersInRoom(parsed.roomId);
+            const payload = JSON.stringify({ type: "cursor", x: parsed.x, y: parsed.y, userId, roomId: parsed.roomId });
+            usersInRoom.forEach((u: any) => {
+                if (u.ws !== ws) u.ws.send(payload);
+            });
+        }
     });
 
     ws.on("close", () => {
-        removeUser(ws);
+        const user = findUser(ws);
+        if (user) {
+            const rooms = [...user.rooms];
+            removeUser(ws);
+            // Broadcast user left to all rooms they were in
+            rooms.forEach(roomId => broadcastRoomUsers(roomId));
+        }
     });
 });
