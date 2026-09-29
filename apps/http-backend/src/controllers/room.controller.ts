@@ -9,6 +9,10 @@ export async function createRoom(req: Request, res: Response) {
         return;
     }
     const userId = req.userId;
+    if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
     try {
         const room = await prismaClient.room.create({
             data: {
@@ -19,5 +23,23 @@ export async function createRoom(req: Request, res: Response) {
         res.json({ roomId: room.id });
     } catch {
         res.status(409).json({ message: "Room already exists" });
+    }
+}
+
+export async function getRoom(req: Request, res: Response): Promise<void> {
+    const slug = req.params.slug as string;
+    try {
+        const room = await prismaClient.room.findUnique({
+            where: { slug },
+        });
+
+        if (!room) {
+            res.status(404).json({ message: "Room not found" });
+            return;
+        }
+
+        res.json({ room });
+    } catch (e) {
+        res.status(500).json({ message: "Internal server error" });
     }
 }

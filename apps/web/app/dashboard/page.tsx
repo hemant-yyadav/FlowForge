@@ -32,10 +32,29 @@ export default function DashboardPage() {
         router.push(`/room/${roomName}`);
     }
 
-    function handleJoinRoom(e: React.FormEvent) {
+    const [joining, setJoining] = useState(false);
+
+    async function handleJoinRoom(e: React.FormEvent) {
         e.preventDefault();
-        if (!joinSlug.trim()) return;
-        router.push(`/room/${joinSlug.trim()}`);
+        const slug = joinSlug.trim();
+        if (!slug) return;
+        
+        setError("");
+        setJoining(true);
+
+        const { error: err } = await apiRequest(`/room/${slug}`, {
+            method: "GET",
+            token: token ?? "",
+        });
+
+        setJoining(false);
+
+        if (err) {
+            setError("Room not found");
+            return;
+        }
+
+        router.push(`/room/${slug}`);
     }
 
     if (loading || !token) return null;

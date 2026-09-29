@@ -11,7 +11,7 @@
     right: -150px;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -41,28 +41,27 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     gap: 24px;
-    align-items: center;
+    align-items: stretch;
 }
 
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: 12px;
     padding: 36px;
-    transition: border-color 0.2s;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .card:hover {
-    border-color: var(--border-light);
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .cardIcon {
     font-size: 1.4rem;
     margin-bottom: 16px;
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent);
 }
 
 .cardTitle {
@@ -88,11 +87,11 @@
     width: 100%;
     padding: 12px 24px;
     background: var(--bg-input);
-    border: 1px solid var(--border-light);
-    border-radius: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
     color: var(--text-primary);
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
@@ -100,7 +99,8 @@
 
 .joinBtn:hover {
     border-color: var(--accent);
-    color: var(--accent-light);
+    color: var(--accent);
+    background: var(--bg-card);
 }
 
 .divider {
@@ -114,5 +114,6 @@
     font-size: 0.85rem;
     padding: 8px 12px;
     border: 1px solid var(--border);
+    background: var(--bg-secondary);
     border-radius: 100px;
 }

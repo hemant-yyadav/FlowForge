@@ -63,14 +63,26 @@ export default function RoomPage() {
                         <p>Start the conversation!</p>
                     </div>
                 )}
-                {messages.map((msg, i) => (
-                    <div
-                        key={i}
-                        className={`${styles.bubble} ${msg.own ? styles.own : styles.other}`}
-                    >
-                        {msg.text}
-                    </div>
-                ))}
+                {messages.map((msg, i) => {
+                    const isOwn = msg.own;
+                    return (
+                        <div key={i} className={`${styles.messageRow} ${isOwn ? styles.rowOwn : styles.rowOther}`}>
+                            {!isOwn && (
+                                <div className={styles.avatar}>
+                                    {msg.senderName ? msg.senderName.charAt(0).toUpperCase() : "?"}
+                                </div>
+                            )}
+                            <div className={`${styles.bubble} ${isOwn ? styles.own : styles.other}`}>
+                                {!isOwn && (
+                                    <div className={styles.senderName}>
+                                        {msg.senderName || "Unknown"}
+                                    </div>
+                                )}
+                                <div className={styles.messageText}>{msg.text}</div>
+                            </div>
+                        </div>
+                    );
+                })}
                 <div ref={bottomRef} />
             </div>
 
@@ -90,7 +102,7 @@ export default function RoomPage() {
                     className={styles.sendBtn}
                     disabled={!connected || !input.trim()}
                 >
-                    ↑
+                    ➤
                 </button>
             </form>
         </div>
