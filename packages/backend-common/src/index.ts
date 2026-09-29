@@ -1,1 +1,2 @@
-export const JWT_SECRET = "sadljfl;asjdlf;";
+export * from "./config.js";
+export * from "./auth.js";
