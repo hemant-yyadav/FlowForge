@@ -11,7 +11,7 @@
     left: -200px;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -21,7 +21,7 @@
     right: -100px;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -37,11 +37,11 @@
 .badge {
     display: inline-block;
     padding: 6px 16px;
-    background: rgba(124, 58, 237, 0.15);
-    border: 1px solid rgba(124, 58, 237, 0.3);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
     border-radius: 100px;
-    color: var(--accent-light);
-    font-size: 0.8rem;
+    color: var(--accent);
+    font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -58,10 +58,7 @@
 }
 
 .gradient {
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent);
 }
 
 .subtext {
@@ -82,17 +79,18 @@
 
 .secondaryBtn {
     padding: 12px 24px;
-    border: 1px solid var(--border-light);
-    border-radius: 10px;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 0.95rem;
     font-weight: 500;
     transition: all 0.2s;
 }
 
 .secondaryBtn:hover {
     border-color: var(--accent);
-    color: var(--text-primary);
+    color: var(--accent);
 }
 
 .features {
@@ -105,14 +103,16 @@
 .featureCard {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 28px;
-    transition: border-color 0.2s, transform 0.2s;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .featureCard:hover {
     border-color: var(--accent);
     transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .featureIcon {
@@ -121,14 +121,14 @@
 }
 
 .featureCard h3 {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 8px;
 }
 
 .featureCard p {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
     line-height: 1.6;
 }

@@ -1,36 +1,55 @@
 .nav {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 18px 60px;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
-    background: rgba(10, 10, 15, 0.85);
-    backdrop-filter: blur(12px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .logo {
-    font-size: 1.2rem;
-    font-weight: 800;
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
     letter-spacing: -0.5px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.themeToggle {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    color: var(--text-primary);
+}
+
+.themeToggle:hover {
+    background: var(--bg-input);
 }
 
 .links {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
 }
 
 .link {
     color: var(--text-secondary);
-    font-size: 0.9rem;
     font-weight: 500;
+    font-size: 0.95rem;
     transition: color 0.2s;
 }
 
@@ -39,34 +58,31 @@
 }
 
 .btn {
-    padding: 8px 20px;
-    background: var(--gradient);
+    padding: 8px 16px;
+    background: var(--accent);
     color: #fff;
-    font-size: 0.88rem;
-    font-weight: 600;
     border-radius: 8px;
-    transition: opacity 0.2s, transform 0.2s;
-    box-shadow: 0 0 16px var(--accent-glow);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background 0.2s;
 }
 
 .btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+    background: var(--accent-light);
 }
 
 .signout {
-    padding: 8px 18px;
-    background: transparent;
+    padding: 8px 16px;
+    background: var(--bg-input);
+    color: var(--text-primary);
     border: 1px solid var(--border);
     border-radius: 8px;
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    font-weight: 500;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s;
-    font-family: inherit;
 }
 
 .signout:hover {
-    border-color: var(--error);
-    color: var(--error);
+    border-color: var(--accent);
 }

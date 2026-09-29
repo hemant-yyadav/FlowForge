@@ -16,47 +16,46 @@
     transform: translate(-50%, -50%);
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
     pointer-events: none;
 }
 
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 20px;
+    border-radius: 16px;
     padding: 48px 44px;
     width: 100%;
     max-width: 420px;
     position: relative;
     z-index: 1;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .back {
     display: inline-block;
     color: var(--text-muted);
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     margin-bottom: 32px;
     transition: color 0.2s;
 }
 
 .back:hover {
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 .brandMark {
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: var(--gradient);
+    background: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
-    font-size: 1rem;
+    font-weight: 700;
+    font-size: 1.1rem;
     color: #fff;
     margin-bottom: 24px;
-    box-shadow: 0 0 20px var(--accent-glow);
 }
 
 .title {
@@ -68,7 +67,7 @@
 }
 
 .subtitle {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
     margin-bottom: 36px;
 }
@@ -81,11 +80,11 @@
 }
 
 .link {
-    color: var(--accent-light);
+    color: var(--accent);
     font-weight: 500;
     transition: color 0.2s;
 }
 
 .link:hover {
-    color: #fff;
+    color: var(--accent-light);
 }
