@@ -50,6 +50,8 @@ wss.on("connection", async function connection(ws, request) {
 
     ws.on("error", console.error);
 
+    const connectionId = Math.random().toString(36).substring(2, 15);
+
     ws.on("message", async function message(data) {
         let parsed: any;
         const rawString = data.toString();
@@ -85,7 +87,7 @@ wss.on("connection", async function connection(ws, request) {
 
         if (parsed.type === "cursor") {
             const usersInRoom = getUsersInRoom(parsed.roomId);
-            const payload = JSON.stringify({ type: "cursor", x: parsed.x, y: parsed.y, userId, roomId: parsed.roomId });
+            const payload = JSON.stringify({ type: "cursor", x: parsed.x, y: parsed.y, userId: connectionId, roomId: parsed.roomId });
             usersInRoom.forEach((u: any) => {
                 if (u.ws !== ws) u.ws.send(payload);
             });
