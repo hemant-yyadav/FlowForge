@@ -49,10 +49,6 @@ wss.on("connection", async function connection(ws, request) {
 
     ws.on("error", console.error);
 
-    ws.on("close", () => {
-        removeUser(ws);
-    });
-
     ws.on("message", async function message(data) {
         let parsed: any;
         const rawString = data.toString();
