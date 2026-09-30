@@ -1,6 +1,6 @@
 import { Router, IRouter } from "express";
 import { middleware } from "../middleware";
-import { createNote, getNotes, getNote, updateNote, deleteNote } from "../controllers/note.controller";
+import { createNote, getNotes, getNote, updateNote, deleteNote, getRoomsForNote, addRoomToNote, removeRoomFromNote } from "../controllers/note.controller";
 
 const router: IRouter = Router();
 
@@ -12,5 +12,9 @@ router.get("/workspaces/:workspaceId/notes", middleware, getNotes);
 router.get("/notes/:id", middleware, getNote);
 router.put("/notes/:id", middleware, updateNote);
 router.delete("/notes/:id", middleware, deleteNote);
+
+router.get("/notes/:noteId/rooms", middleware, getRoomsForNote);
+router.post("/notes/:noteId/rooms", middleware, addRoomToNote);
+router.delete("/notes/:noteId/rooms/:roomId", middleware, removeRoomFromNote);
 
 export default router;

@@ -71,6 +71,7 @@ model Room {
   workspaceId String?
   workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   favorites   Favorite[]
+  referencedInNotes NoteWhiteboard[]
 }
 
 model Chat {
@@ -109,6 +110,7 @@ model Note {
 
   tags        Tag[]
   favorites   Favorite[]
+  whiteboards NoteWhiteboard[]
 
   @@index([workspaceId])
   @@index([userId])
@@ -137,4 +139,14 @@ model Favorite {
 
   @@unique([userId, noteId])
   @@unique([userId, roomId])
+}
+
+model NoteWhiteboard {
+  noteId    String
+  roomId    Int
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([noteId, roomId])
 }

@@ -99,3 +99,43 @@ export async function getWorkspace(req: Request, res: Response): Promise<void> {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function getWorkspaceRooms(req: Request, res: Response): Promise<void> {
+    const userId = req.userId;
+    if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+
+    const workspaceId = req.params.workspaceId as string;
+
+    try {
+        const workspace = await prismaClient.workspace.findUnique({
+            where: { id: workspaceId },
+        });
+
+        if (!workspace) {
+            res.status(404).json({ message: "Workspace not found" });
+            return;
+        }
+
+        const isOwner = workspace.ownerId === userId;
+        const isMember = await prismaClient.workspaceMember.findUnique({
+            where: { workspaceId_userId: { workspaceId, userId } }
+        });
+
+        if (!isOwner && !isMember) {
+            res.status(403).json({ message: "Forbidden" });
+            return;
+        }
+
+        const rooms = await prismaClient.room.findMany({
+            where: { workspaceId }
+        });
+
+        res.json({ rooms });
+    } catch (e) {
+        console.error("Error fetching workspace rooms", e);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
