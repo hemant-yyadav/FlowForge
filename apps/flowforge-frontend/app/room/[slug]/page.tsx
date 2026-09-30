@@ -40,7 +40,7 @@ function RoomCanvasInner() {
         setToken(storedToken);
 
         // Fetch initial shapes from HTTP backend
-        fetch(`${HTTP_URL}/room/${slug}/shapes`, {
+        fetch(`http://localhost:3001/room/${slug}/shapes`, {
             headers: { "Authorization": `Bearer ${storedToken}` }
         })
         .then(res => {
@@ -116,31 +116,39 @@ function RoomCanvasInner() {
             <ChatSidebar chats={chats} sendChat={sendChat} roomUsers={roomUsers} />
             <CursorOverlay cursors={remoteCursors} />
             
-            <button
-                onClick={() => window.location.href = "http://localhost:3000/dashboard"}
-                style={{
-                    position: "absolute",
-                    top: 20,
-                    right: 20,
-                    background: "rgba(30, 30, 30, 0.9)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "#fff",
-                    padding: "10px 16px",
-                    borderRadius: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-                    zIndex: 10,
-                    fontWeight: 500,
-                    transition: "all 0.2s"
-                }}
-            >
-                <LogOut size={18} />
-                Exit Room
-            </button>
+            {!searchParams.get("embedded") && (
+                <button
+                    onClick={() => {
+                        if (window.opener) {
+                            window.close();
+                        }
+                        // Fallback or if not opened via target=_blank
+                        window.location.href = "http://localhost:3000/dashboard";
+                    }}
+                    style={{
+                        position: "absolute",
+                        top: 20,
+                        right: 20,
+                        background: "rgba(30, 30, 30, 0.9)",
+                        backdropFilter: "blur(10px)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#fff",
+                        padding: "10px 16px",
+                        borderRadius: "12px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                        zIndex: 10,
+                        fontWeight: 500,
+                        transition: "all 0.2s"
+                    }}
+                >
+                    <LogOut size={18} />
+                    Exit Room
+                </button>
+            )}
 
             <canvas
                 ref={canvasRef}
