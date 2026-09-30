@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import { useWorkspaces } from "../../hooks/useWorkspaces";
 import { User, Users } from "lucide-react";
+import { ProfileDropdown } from "../../components/workspace/ProfileDropdown";
 
 function decodeJWT(token: string | null) {
     if (!token) return null;
@@ -17,7 +18,7 @@ function decodeJWT(token: string | null) {
 function WorkspacesContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { token, loading } = useAuth();
+    const { token, loading, user: currentUser } = useAuth();
 
     useEffect(() => {
         const urlToken = searchParams.get("token");
@@ -34,7 +35,6 @@ function WorkspacesContent() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { data, isLoading } = useWorkspaces(token);
-    const currentUser = decodeJWT(token);
 
     if (loading || isLoading) return <div style={{padding: "48px", color: "var(--text-muted)", textAlign: "center"}}>Loading workspaces...</div>;
 
@@ -71,18 +71,17 @@ function WorkspacesContent() {
                     <h1 style={{ fontSize: "2rem", marginBottom: "8px" }}>Select a Workspace</h1>
                     <p style={{ color: "var(--text-muted)", margin: 0 }}>Choose a workspace to continue</p>
                 </div>
-                <div style={{ display: "flex", gap: "16px" }}>
-                    <button 
-                        className="btn-secondary" 
-                        onClick={() => {
-                            localStorage.removeItem("token");
-                            window.location.href = "/signin";
-                        }}
-                        style={{ padding: "8px 16px", borderRadius: "8px", border: "1px solid var(--border)", background: "transparent", color: "var(--text-secondary)", cursor: "pointer" }}
-                    >
-                        Logout
-                    </button>
+                <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
                     <button className="btn-primary" onClick={() => setIsCreating(true)}>+ New Workspace</button>
+                    {currentUser && (
+                        <ProfileDropdown 
+                            user={currentUser} 
+                            onLogout={() => {
+                                localStorage.removeItem("token");
+                                window.location.href = "/signin";
+                            }} 
+                        />
+                    )}
                 </div>
             </div>
 
@@ -102,7 +101,7 @@ function WorkspacesContent() {
             
             <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))" }}>
                 {workspaces.map((ws: any) => {
-                    const isOwner = currentUser?.userId === ws.ownerId;
+                    const isOwner = (currentUser as any)?.userId === ws.ownerId || currentUser?.id === ws.ownerId;
                     return (
                         <div 
                             key={ws.id} 

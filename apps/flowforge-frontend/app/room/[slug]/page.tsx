@@ -30,6 +30,7 @@ function RoomCanvasInner() {
     const [initialShapes, setInitialShapes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [role, setRole] = useState<string>("VIEWER");
 
     useEffect(() => {
         let storedToken = localStorage.getItem("token");
@@ -70,6 +71,9 @@ function RoomCanvasInner() {
                 // Parse the stringified shape data from DB
                 const parsedShapes = data.shapes.map((s: any) => JSON.parse(s.data));
                 setInitialShapes(parsedShapes);
+            }
+            if (data.role) {
+                setRole(data.role);
             }
             setLoading(false);
         })
@@ -133,11 +137,11 @@ function RoomCanvasInner() {
                 <CursorOverlay cursors={remoteCursors} />
                 <canvas
                     ref={canvasRef}
-                    onMouseDown={onMouseDown}
-                    onMouseMove={onMouseMove}
-                    onMouseUp={onMouseUp}
-                    onMouseLeave={onMouseUp}
-                    style={{ display: "block", cursor: "crosshair" }}
+                    onMouseDown={role !== "VIEWER" ? onMouseDown : undefined}
+                    onMouseMove={role !== "VIEWER" ? onMouseMove : undefined}
+                    onMouseUp={role !== "VIEWER" ? onMouseUp : undefined}
+                    onMouseLeave={role !== "VIEWER" ? onMouseUp : undefined}
+                    style={{ display: "block", cursor: role !== "VIEWER" ? "crosshair" : "default" }}
                 />
                 {!connected && (
                     <div style={{ position: "absolute", bottom: 20, right: 20, background: "rgba(255,0,0,0.8)", padding: "8px 16px", borderRadius: "8px", color: "#fff", fontSize: "12px" }}>
@@ -150,7 +154,9 @@ function RoomCanvasInner() {
 
     return (
         <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#111" }}>
-            <Toolbar currentTool={currentTool} setCurrentTool={setCurrentTool} color={color} setColor={setColor} clearBoard={clearBoard} />
+            {role !== "VIEWER" && (
+                <Toolbar currentTool={currentTool} setCurrentTool={setCurrentTool} color={color} setColor={setColor} clearBoard={clearBoard} />
+            )}
             <ChatSidebar chats={chats} sendChat={sendChat} roomUsers={roomUsers} />
             
             <CursorOverlay cursors={remoteCursors} />
@@ -189,13 +195,13 @@ function RoomCanvasInner() {
 
             <canvas
                 ref={canvasRef}
-                onMouseDown={onMouseDown}
-                onMouseMove={onMouseMove}
-                onMouseUp={onMouseUp}
-                onMouseLeave={onMouseUp}
+                onMouseDown={role !== "VIEWER" ? onMouseDown : undefined}
+                onMouseMove={role !== "VIEWER" ? onMouseMove : undefined}
+                onMouseUp={role !== "VIEWER" ? onMouseUp : undefined}
+                onMouseLeave={role !== "VIEWER" ? onMouseUp : undefined}
                 style={{
                     display: "block",
-                    cursor: "crosshair"
+                    cursor: role !== "VIEWER" ? "crosshair" : "default"
                 }}
             />
             

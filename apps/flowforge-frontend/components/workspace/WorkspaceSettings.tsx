@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
-import { useWorkspace, useAddWorkspaceMember, useRemoveWorkspaceMember, useDeleteWorkspace } from "../../hooks/useWorkspaces";
+import { useWorkspace, useAddWorkspaceMember, useRemoveWorkspaceMember, useDeleteWorkspace, useUpdateWorkspaceMemberRole } from "../../hooks/useWorkspaces";
 import { useAuth } from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 import { UserPlus, UserMinus, Trash2, Users } from "lucide-react";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ export function WorkspaceSettings({ workspaceId }: { workspaceId: string }) {
     const { data, isLoading } = useWorkspace(workspaceId, token);
     const addMember = useAddWorkspaceMember(workspaceId, token);
     const removeMember = useRemoveWorkspaceMember(workspaceId, token);
+    const updateRole = useUpdateWorkspaceMemberRole(workspaceId, token);
     const deleteWorkspace = useDeleteWorkspace(token);
 
     const [inviteUsername, setInviteUsername] = useState("");
@@ -41,8 +43,18 @@ export function WorkspaceSettings({ workspaceId }: { workspaceId: string }) {
     const handleRemoveMember = async (userId: string) => {
         try {
             await removeMember.mutateAsync(userId);
+            toast.success("Member removed");
         } catch (e: any) {
-            alert(e.message || "Failed to remove member");
+            toast.error(e.message || "Failed to remove member");
+        }
+    };
+
+    const handleRoleChange = async (userId: string, newRole: string) => {
+        try {
+            await updateRole.mutateAsync({ userId, role: newRole });
+            toast.success("Role updated");
+        } catch (e: any) {
+            toast.error(e.message || "Failed to update role");
         }
     };
 
@@ -87,7 +99,22 @@ export function WorkspaceSettings({ workspaceId }: { workspaceId: string }) {
                                 </div>
                                 <div>
                                     <div style={{ fontWeight: 500 }}>{member.user.name}</div>
-                                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>@{member.user.username} • {member.role}</div>
+                                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+                                        @{member.user.username} • 
+                                        {isOwner ? (
+                                            <select 
+                                                value={member.role} 
+                                                onChange={(e) => handleRoleChange(member.user.id, e.target.value)}
+                                                disabled={updateRole.isPending}
+                                                style={{ background: "transparent", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: "4px", fontSize: "0.8rem", padding: "2px 4px", cursor: "pointer", outline: "none" }}
+                                            >
+                                                <option value="VIEWER">VIEWER</option>
+                                                <option value="EDITOR">EDITOR</option>
+                                            </select>
+                                        ) : (
+                                            member.role
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             {isOwner && (

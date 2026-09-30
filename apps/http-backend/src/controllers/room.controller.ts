@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CreateRoomSchema } from "@repo/common/src/types";
 import { prismaClient } from "db";
-import { canAccessRoom } from "../utils/auth";
+import { canAccessRoom, canModifyWorkspaceContent, getUserRoleInWorkspace } from "../utils/auth";
 
 export async function createRoom(req: Request, res: Response) {
     const parsedData = CreateRoomSchema.safeParse(req.body);
@@ -15,6 +15,14 @@ export async function createRoom(req: Request, res: Response) {
         return;
     }
     try {
+        if (parsedData.data.workspaceId) {
+            const canModify = await canModifyWorkspaceContent(userId, parsedData.data.workspaceId);
+            if (!canModify) {
+                res.status(403).json({ message: "Forbidden: You do not have permission to create rooms in this workspace" });
+                return;
+            }
+        }
+
         const room = await prismaClient.room.create({
             data: {
                 slug: parsedData.data.name,
@@ -59,7 +67,15 @@ export async function getShapes(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        res.json({ shapes: room.shapes });
+        const userId = req.userId;
+        let role = null;
+        if (userId && room.workspaceId) {
+            role = await getUserRoleInWorkspace(userId, room.workspaceId);
+        } else if (userId && room.adminId === userId) {
+            role = "OWNER";
+        }
+
+        res.json({ shapes: room.shapes, role });
     } catch (e) {
         res.status(500).json({ message: "Internal server error" });
     }
@@ -128,11 +144,14 @@ export async function deleteRoom(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        // Only the room admin or the workspace owner can delete the room
         const isRoomAdmin = room.adminId === userId;
-        const isWorkspaceOwner = room.workspace?.ownerId === userId;
+        
+        let canModifyWorkspace = false;
+        if (room.workspaceId) {
+            canModifyWorkspace = await canModifyWorkspaceContent(userId, room.workspaceId);
+        }
 
-        if (!isRoomAdmin && !isWorkspaceOwner) {
+        if (!isRoomAdmin && !canModifyWorkspace) {
             res.status(403).json({ message: "Forbidden: You do not have permission to delete this room." });
             return;
         }

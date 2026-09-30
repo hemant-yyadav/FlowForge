@@ -261,3 +261,38 @@ export async function removeMember(req: Request, res: Response): Promise<void> {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function changeMemberRole(req: Request, res: Response): Promise<void> {
+    const userId = req.userId;
+    if (!userId) { res.status(401).json({ message: "Unauthorized" }); return; }
+
+    const workspaceId = req.params.id as string;
+    const targetUserId = req.params.userId as string;
+    const { role } = req.body;
+
+    if (role !== "EDITOR" && role !== "VIEWER") {
+        res.status(400).json({ message: "Invalid role. Must be EDITOR or VIEWER." });
+        return;
+    }
+
+    try {
+        const workspace = await prismaClient.workspace.findUnique({ where: { id: workspaceId } });
+        if (!workspace) { res.status(404).json({ message: "Workspace not found" }); return; }
+        
+        // Only the owner can change roles
+        if (workspace.ownerId !== userId) { 
+            res.status(403).json({ message: "Only the workspace owner can change member roles" }); 
+            return; 
+        }
+
+        const member = await prismaClient.workspaceMember.update({
+            where: { workspaceId_userId: { workspaceId, userId: targetUserId } },
+            data: { role }
+        });
+
+        res.json({ member });
+    } catch (e) {
+        console.error("Error changing member role", e);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

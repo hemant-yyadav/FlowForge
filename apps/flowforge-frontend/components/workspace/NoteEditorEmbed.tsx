@@ -62,6 +62,7 @@ const schema = BlockNoteSchema.create({
 export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, workspaceId: string }) {
     const { token } = useAuth();
     const { data: noteData, isLoading } = useNote(noteId, token);
+    const isViewer = noteData?.role === "VIEWER";
     const { data: roomsData } = useNoteRooms(noteId, token);
     const { data: wsRoomsData } = useWorkspaceRooms(workspaceId, token);
 
@@ -137,12 +138,14 @@ export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, works
                 value={localTitle} 
                 onChange={e => setLocalTitle(e.target.value)}
                 placeholder="Note Title"
-                style={{ fontSize: "2.5rem", marginBottom: "8px", marginTop: 0, width: "100%", background: "transparent", border: "none", color: "var(--text-primary)", fontWeight: "bold", outline: "none", paddingLeft: "54px" }}
+                style={{ fontSize: "2.5rem", marginBottom: "8px", marginTop: 0, width: "100%", background: "transparent", border: "none", color: "var(--text-primary)", fontWeight: "bold", outline: "none", paddingLeft: "54px", pointerEvents: isViewer ? "none" : "auto" }}
+                readOnly={isViewer}
             />
             <div style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginBottom: "32px", paddingLeft: "54px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>Updated {new Date(note.updatedAt).toLocaleString()} {updateNote.isPending && <span style={{ marginLeft: "8px", color: "var(--accent)" }}>Saving...</span>}</span>
                 
-                <div style={{ display: "flex", gap: "8px" }}>
+                {!isViewer && (
+                    <div style={{ display: "flex", gap: "8px" }}>
                     <select 
                         style={{ padding: "6px 12px", fontSize: "0.85rem", background: "var(--bg-card)", color: "var(--text-primary)", border: "1px solid var(--border)", borderRadius: "6px", outline: "none", cursor: "pointer", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}
                         onChange={(e) => {
@@ -162,7 +165,8 @@ export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, works
                         <option value="" disabled>+ Embed Whiteboard</option>
                         {allWorkspaceRooms.map((r: any) => <option key={r.id} value={r.slug}>{r.slug}</option>)}
                     </select>
-                </div>
+                    </div>
+                )}
             </div>
             
             <div style={{ minHeight: "400px", marginBottom: "32px", background: "var(--bg-card)", borderRadius: "12px", border: "1px solid var(--border)", padding: "24px 0", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
@@ -170,6 +174,7 @@ export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, works
                     <BlockNoteView 
                         editor={editor as any} 
                         theme="dark" // Changed to dark theme
+                        editable={!isViewer}
                         onChange={() => {
                             if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
                             saveTimeoutRef.current = setTimeout(() => {
@@ -183,7 +188,7 @@ export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, works
             <div style={{ borderTop: "1px solid var(--border)", paddingTop: "32px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
                     <h2 style={{ fontSize: "1.2rem", margin: 0 }}>Attached Whiteboards (External)</h2>
-                    <button className="btn-primary" onClick={() => setShowAttach(!showAttach)}>+ Attach Whiteboard</button>
+                    {!isViewer && <button className="btn-primary" onClick={() => setShowAttach(!showAttach)}>+ Attach Whiteboard</button>}
                 </div>
 
                 {showAttach && (
@@ -208,7 +213,9 @@ export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, works
                                 onToggleFavorite={() => {}} 
                                 onClick={() => window.open(`/room/${room.slug}`, "_blank")} 
                             />
-                            <button onClick={() => detachRoom.mutate(room.id)} style={{ position: "absolute", top: "-10px", right: "-10px", background: "var(--error)", border: "none", color: "white", borderRadius: "50%", width: "24px", height: "24px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 4px rgba(0,0,0,0.2)", zIndex: 10 }}>✕</button>
+                            {!isViewer && (
+                                <button onClick={() => detachRoom.mutate(room.id)} style={{ position: "absolute", top: "-10px", right: "-10px", background: "var(--error)", border: "none", color: "white", borderRadius: "50%", width: "24px", height: "24px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 4px rgba(0,0,0,0.2)", zIndex: 10 }}>✕</button>
+                            )}
                         </div>
                     ))}
                     {rooms.length === 0 && <p style={{ color: "var(--text-muted)", gridColumn: "1 / -1" }}>No external whiteboards explicitly attached. Use the "+ Embed Whiteboard" button above to insert them directly into the document!</p>}

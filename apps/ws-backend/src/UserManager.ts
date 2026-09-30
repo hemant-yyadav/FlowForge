@@ -5,11 +5,13 @@ export interface User {
     rooms: string[];
     userId: string;
     name: string;
+    roles: Record<string, string>; // mapping from roomId to role
 }
 
 const users: User[] = [];
 
 export function addUser(user: User) {
+    if (!user.roles) user.roles = {};
     users.push(user);
 }
 

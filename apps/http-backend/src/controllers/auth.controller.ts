@@ -108,3 +108,25 @@ export async function oauthSignin(req: Request, res: Response) {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function getMe(req: Request, res: Response) {
+    const userId = req.userId;
+    if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+    try {
+        const user = await prismaClient.user.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true, username: true, email: true, photo: true }
+        });
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        res.json({ user });
+    } catch (error) {
+        console.error("Get me error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

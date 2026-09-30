@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNotes, useWorkspaceRooms, useDeleteNote, useDeleteWorkspaceRoom } from "../../../hooks/useNotes";
+import { useWorkspace } from "../../../hooks/useWorkspaces";
 import { useFavorites, useToggleNoteFavorite, useToggleRoomFavorite } from "../../../hooks/useFavorites";
 import { useActiveRooms } from "../../../hooks/useActiveRooms";
 import { useTabManager } from "../../../hooks/useTabManager";
@@ -23,12 +24,24 @@ export default function WorkspaceDashboard() {
     const { workspaceId } = useParams<{workspaceId: string}>();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     
+    const { data: wsData, isLoading: wsLoading } = useWorkspace(workspaceId, token);
     const { data: notesData, isLoading: notesLoading } = useNotes(workspaceId, token);
     const { data: roomsData, isLoading: roomsLoading } = useWorkspaceRooms(workspaceId, token);
     const { data: activeRooms = [] } = useActiveRooms();
     const { data: favData } = useFavorites(token);
+
+    let currentUserRole = "VIEWER";
+    if (wsData?.workspace && user) {
+        const uid = (user as any).userId || user.id;
+        if (wsData.workspace.ownerId === uid) {
+            currentUserRole = "OWNER";
+        } else {
+            const member = wsData.workspace.members?.find((m: any) => m.userId === uid);
+            if (member) currentUserRole = member.role;
+        }
+    }
 
     const toggleNoteFav = useToggleNoteFavorite(token);
     const toggleRoomFav = useToggleRoomFavorite(token);
@@ -145,7 +158,17 @@ export default function WorkspaceDashboard() {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "var(--bg-primary)" }}>
-            <TabBar tabs={tabs} activeTabId={activeTabId} onTabClick={setActiveTabId} onTabClose={closeTab} />
+            <TabBar 
+                tabs={tabs} 
+                activeTabId={activeTabId} 
+                onTabClick={setActiveTabId} 
+                onTabClose={closeTab} 
+                user={user}
+                onLogout={() => {
+                    localStorage.removeItem("token");
+                    window.location.href = "/signin";
+                }}
+            />
             
             <div style={{ flex: 1, overflowY: "auto", padding: "0 32px 32px 32px" }}>
                 <CreateContentModal 
@@ -193,33 +216,39 @@ export default function WorkspaceDashboard() {
 
                                     <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
 
-                                    <button 
-                                        className="btn-primary" 
-                                        onClick={() => setShowCreate({ open: true, defaultType: "whiteboard" })} 
-                                        style={{ padding: "8px 16px", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }}
-                                    >
-                                        <Presentation size={18} /> New Meeting
-                                    </button>
-                                    
-                                    <button 
-                                        onClick={() => setShowCreate({ open: true, defaultType: "note" })} 
-                                        style={{ padding: "8px 16px", background: "var(--accent-glow)", color: "var(--accent)", display: "flex", alignItems: "center", gap: "8px", borderRadius: "8px", border: "none", cursor: "pointer", fontWeight: 600, transition: "0.2s" }}
-                                        onMouseOver={e => e.currentTarget.style.background = "var(--border)"}
-                                        onMouseOut={e => e.currentTarget.style.background = "var(--accent-glow)"}
-                                    >
-                                        <FileText size={18} /> New Note
-                                    </button>
+                                    {currentUserRole !== "VIEWER" && (
+                                        <>
+                                            <button 
+                                                className="btn-primary" 
+                                                onClick={() => setShowCreate({ open: true, defaultType: "whiteboard" })} 
+                                                style={{ padding: "8px 16px", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }}
+                                            >
+                                                <Presentation size={18} /> New Meeting
+                                            </button>
+                                            
+                                            <button 
+                                                onClick={() => setShowCreate({ open: true, defaultType: "note" })} 
+                                                style={{ padding: "8px 16px", background: "var(--accent-glow)", color: "var(--accent)", display: "flex", alignItems: "center", gap: "8px", borderRadius: "8px", border: "none", cursor: "pointer", fontWeight: 600, transition: "0.2s" }}
+                                                onMouseOver={e => e.currentTarget.style.background = "var(--border)"}
+                                                onMouseOut={e => e.currentTarget.style.background = "var(--accent-glow)"}
+                                            >
+                                                <FileText size={18} /> New Note
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
 
-                                <button 
-                                    onClick={() => openTab("settings", "settings", "Settings")}
-                                    style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "44px", height: "44px", background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: "12px", color: "var(--text-secondary)", cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
-                                    onMouseOver={e => { e.currentTarget.style.background = "var(--bg-card)"; e.currentTarget.style.color = "var(--text-primary)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                                    onMouseOut={e => { e.currentTarget.style.background = "var(--bg-input)"; e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                                    title="Workspace Settings"
-                                >
-                                    <Settings size={22} />
-                                </button>
+                                {currentUserRole !== "VIEWER" && (
+                                    <button 
+                                        onClick={() => openTab("settings", "settings", "Settings")}
+                                        style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "44px", height: "44px", background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: "12px", color: "var(--text-secondary)", cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
+                                        onMouseOver={e => { e.currentTarget.style.background = "var(--bg-card)"; e.currentTarget.style.color = "var(--text-primary)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                                        onMouseOut={e => { e.currentTarget.style.background = "var(--bg-input)"; e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                                        title="Workspace Settings"
+                                    >
+                                        <Settings size={22} />
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -246,7 +275,7 @@ export default function WorkspaceDashboard() {
                                                 else toggleRoomFav.mutate(c.id);
                                             }}
                                             onClick={() => openTab(c._type, c._type === "note" ? c.id : c.slug, c.title)}
-                                            onDelete={() => setDeleteModal({ open: true, type: c._type, id: c.id, title: c.title })}
+                                            onDelete={currentUserRole !== "VIEWER" ? () => setDeleteModal({ open: true, type: c._type, id: c.id, title: c.title }) : undefined}
                                         />
                                     ))}
                                 </div>

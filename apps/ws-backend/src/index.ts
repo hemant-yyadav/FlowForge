@@ -55,7 +55,7 @@ wss.on("connection", async function connection(ws, request) {
         return;
     }
 
-    addUser({ ws, rooms: [], userId, name: "Unknown" });
+    addUser({ ws, rooms: [], userId, name: "Unknown", roles: {} });
 
     prismaClient.user.findUnique({
         where: { id: userId }
@@ -109,6 +109,10 @@ wss.on("connection", async function connection(ws, request) {
         }
 
         if (parsed.type === "cursor") {
+            const user = findUser(ws);
+            if (!user || user.roles[parsed.roomId] === "VIEWER") {
+                return;
+            }
             const usersInRoom = getUsersInRoom(parsed.roomId);
             const payload = JSON.stringify({ type: "cursor", x: parsed.x, y: parsed.y, userId: connectionId, roomId: parsed.roomId });
             usersInRoom.forEach((u: any) => {

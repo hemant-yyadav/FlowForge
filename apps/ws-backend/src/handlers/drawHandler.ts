@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
 import { prismaClient } from "db";
-import { getUsersInRoom } from "../UserManager.js";
+import { getUsersInRoom, findUser } from "../UserManager.js";
 
 export async function handleDraw(ws: WebSocket, roomSlug: string, shape: any, userId: string) {
     const room = await prismaClient.room.findUnique({
@@ -8,6 +8,12 @@ export async function handleDraw(ws: WebSocket, roomSlug: string, shape: any, us
     });
 
     if (!room) return;
+
+    const user = findUser(ws);
+    if (!user || user.roles[roomSlug] === "VIEWER") {
+        console.log(`User ${userId} rejected from drawing (role: VIEWER)`);
+        return;
+    }
 
     // Persist shape to database
     try {

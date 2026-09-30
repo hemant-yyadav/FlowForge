@@ -1,20 +1,28 @@
 import { prismaClient } from "db";
 
-export async function canAccessWorkspace(userId: string, workspaceId: string): Promise<boolean> {
+export async function getUserRoleInWorkspace(userId: string, workspaceId: string): Promise<"OWNER" | "EDITOR" | "VIEWER" | null> {
     const workspace = await prismaClient.workspace.findUnique({
         where: { id: workspaceId },
         include: { members: { where: { userId } } }
     });
 
-    if (!workspace) return false;
+    if (!workspace) return null;
+    if (workspace.ownerId === userId) return "OWNER";
+    if (workspace.members.length > 0) return workspace.members[0]?.role as "EDITOR" | "VIEWER";
     
-    const isOwner = workspace.ownerId === userId;
-    const isMember = workspace.members.length > 0;
-    
-    return isOwner || isMember;
+    return null;
 }
 
-// Returns true if allowed, false if forbidden, null if not found
+export async function canAccessWorkspace(userId: string, workspaceId: string): Promise<boolean> {
+    const role = await getUserRoleInWorkspace(userId, workspaceId);
+    return role !== null;
+}
+
+export async function canModifyWorkspaceContent(userId: string, workspaceId: string): Promise<boolean> {
+    const role = await getUserRoleInWorkspace(userId, workspaceId);
+    return role === "OWNER" || role === "EDITOR";
+}
+
 export async function canModifyNote(userId: string, noteId: string): Promise<boolean | null> {
     const note = await prismaClient.note.findUnique({
         where: { id: noteId },
@@ -23,10 +31,7 @@ export async function canModifyNote(userId: string, noteId: string): Promise<boo
 
     if (!note) return null; // Not found
 
-    const isAuthor = note.userId === userId;
-    const isOwner = note.workspace.ownerId === userId;
-
-    return isAuthor || isOwner;
+    return await canModifyWorkspaceContent(userId, note.workspaceId);
 }
 
 export async function canAccessRoom(userId: string, roomId: number): Promise<boolean> {

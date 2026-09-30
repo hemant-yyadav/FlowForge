@@ -20,4 +20,5 @@ export async function fetchWorkspace(workspaceId: string, token: string) { retur
 export async function deleteWorkspace(workspaceId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}`, token, { method: "DELETE" }); }
 export async function addWorkspaceMember(workspaceId: string, username: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members`, token, { method: "POST", body: JSON.stringify({ username }) }); }
 export async function removeWorkspaceMember(workspaceId: string, userId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members/${userId}`, token, { method: "DELETE" }); }
+export async function updateWorkspaceMemberRole(workspaceId: string, userId: string, role: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members/${userId}/role`, token, { method: "PUT", body: JSON.stringify({ role }) }); }
 export async function deleteRoom(roomId: number, token: string) { return authFetch(`${HTTP_URL}/room/${roomId}`, token, { method: "DELETE" }); }

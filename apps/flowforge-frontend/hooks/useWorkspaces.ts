@@ -33,6 +33,14 @@ export function useRemoveWorkspaceMember(workspaceId: string, token: string | nu
     });
 }
 
+export function useUpdateWorkspaceMemberRole(workspaceId: string, token: string | null) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ userId, role }: { userId: string, role: string }) => api.updateWorkspaceMemberRole(workspaceId, userId, role, token!),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId, token] })
+    });
+}
+
 export function useDeleteRoom(workspaceId: string, token: string | null) {
     const qc = useQueryClient();
     return useMutation({

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prismaClient } from "db";
-import { canAccessWorkspace, canModifyNote, canAccessRoom } from "../utils/auth";
+import { canAccessWorkspace, canModifyNote, canAccessRoom, canModifyWorkspaceContent, getUserRoleInWorkspace } from "../utils/auth";
 
 // --- Endpoints ---
 
@@ -34,9 +34,9 @@ export async function createNote(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const hasAccess = await canAccessWorkspace(userId, workspaceId);
-        if (!hasAccess) {
-            res.status(403).json({ message: "Forbidden: You do not have access to this workspace" });
+        const canModify = await canModifyWorkspaceContent(userId, workspaceId);
+        if (!canModify) {
+            res.status(403).json({ message: "Forbidden: You do not have permission to create notes in this workspace" });
             return;
         }
 
@@ -112,13 +112,13 @@ export async function getNote(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const hasAccess = await canAccessWorkspace(userId, note.workspaceId);
-        if (!hasAccess) {
+        const role = await getUserRoleInWorkspace(userId, note.workspaceId);
+        if (role === null) {
             res.status(403).json({ message: "Forbidden: You do not have access to this note" });
             return;
         }
 
-        res.json({ note });
+        res.json({ note, role });
     } catch (e) {
         console.error("Error fetching note:", e);
         res.status(500).json({ message: "Internal server error" });
