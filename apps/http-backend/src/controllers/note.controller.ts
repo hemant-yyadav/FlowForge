@@ -1,36 +1,6 @@
 import { Request, Response } from "express";
 import { prismaClient } from "db";
-
-// --- Helper Functions ---
-
-async function canAccessWorkspace(userId: string, workspaceId: string): Promise<boolean> {
-    const workspace = await prismaClient.workspace.findUnique({
-        where: { id: workspaceId },
-        include: { members: { where: { userId } } }
-    });
-
-    if (!workspace) return false;
-    
-    const isOwner = workspace.ownerId === userId;
-    const isMember = workspace.members.length > 0;
-    
-    return isOwner || isMember;
-}
-
-// Returns true if allowed, false if forbidden, null if not found
-async function canModifyNote(userId: string, noteId: string): Promise<boolean | null> {
-    const note = await prismaClient.note.findUnique({
-        where: { id: noteId },
-        include: { workspace: true }
-    });
-
-    if (!note) return null; // Not found
-
-    const isAuthor = note.userId === userId;
-    const isOwner = note.workspace.ownerId === userId;
-
-    return isAuthor || isOwner;
-}
+import { canAccessWorkspace, canModifyNote } from "../utils/auth";
 
 // --- Endpoints ---
 

@@ -22,6 +22,7 @@ model User {
   ownedWorkspaces Workspace[]
   memberships     WorkspaceMember[]
   notes           Note[]
+  favorites       Favorite[]
 }
 
 enum Role {
@@ -40,6 +41,7 @@ model Workspace {
   members     WorkspaceMember[]
   rooms       Room[]
   notes       Note[]
+  tags        Tag[]
   
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
@@ -68,6 +70,7 @@ model Room {
 
   workspaceId String?
   workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  favorites   Favorite[]
 }
 
 model Chat {
@@ -104,6 +107,34 @@ model Note {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  tags        Tag[]
+  favorites   Favorite[]
+
   @@index([workspaceId])
   @@index([userId])
+}
+
+model Tag {
+  id          String    @id @default(uuid())
+  name        String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  notes       Note[]
+  createdAt   DateTime  @default(now())
+
+  @@unique([name, workspaceId])
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  noteId    String?
+  note      Note?    @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  roomId    Int?
+  room      Room?    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, noteId])
+  @@unique([userId, roomId])
 }
