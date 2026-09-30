@@ -20,7 +20,7 @@ export function useAuth() {
 
     function signout() {
         localStorage.removeItem("token");
-        window.location.href = "http://localhost:3000/logout";
+        window.location.href = "/logout";
     }
 
     return { token, loading, signout };
