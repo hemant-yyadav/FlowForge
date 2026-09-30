@@ -32,3 +32,11 @@ export function useRemoveWorkspaceMember(workspaceId: string, token: string | nu
         onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId, token] })
     });
 }
+
+export function useDeleteRoom(workspaceId: string, token: string | null) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (roomId: number) => api.deleteRoom(roomId, token!),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId, token] })
+    });
+}

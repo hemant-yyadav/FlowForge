@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNotes, useWorkspaceRooms, useDeleteNote, useDeleteWorkspaceRoom } from "../../../hooks/useNotes";
 import { useFavorites, useToggleNoteFavorite, useToggleRoomFavorite } from "../../../hooks/useFavorites";
+import { useActiveRooms } from "../../../hooks/useActiveRooms";
 import { useTabManager } from "../../../hooks/useTabManager";
 import { TabBar } from "../../../components/workspace/TabBar";
 import { FilterBar } from "../../../components/workspace/FilterBar";
@@ -11,6 +12,7 @@ import { EmptyState } from "../../../components/workspace/EmptyState";
 import { CreateContentModal } from "../../../components/workspace/CreateContentModal";
 import { ConfirmationModal } from "../../../components/workspace/ConfirmationModal";
 import { ContentCard } from "../../../components/workspace/Card";
+import toast from "react-hot-toast";
 import { NoteEditorEmbed } from "../../../components/workspace/NoteEditorEmbed";
 import { WhiteboardEmbed } from "../../../components/workspace/WhiteboardEmbed";
 import { WorkspaceSettings } from "../../../components/workspace/WorkspaceSettings";
@@ -25,6 +27,7 @@ export default function WorkspaceDashboard() {
     
     const { data: notesData, isLoading: notesLoading } = useNotes(workspaceId, token);
     const { data: roomsData, isLoading: roomsLoading } = useWorkspaceRooms(workspaceId, token);
+    const { data: activeRooms = [] } = useActiveRooms();
     const { data: favData } = useFavorites(token);
 
     const toggleNoteFav = useToggleNoteFavorite(token);
@@ -64,6 +67,7 @@ export default function WorkspaceDashboard() {
     const confirmDelete = async () => {
         if (!deleteModal.id || !deleteModal.type) return;
 
+        const toastId = toast.loading(`Deleting ${deleteModal.type}...`);
         try {
             if (deleteModal.type === "note") {
                 await deleteNote.mutateAsync(deleteModal.id as string);
@@ -79,9 +83,10 @@ export default function WorkspaceDashboard() {
                 closeTab(openTabItem.id);
             }
 
+            toast.success(`${deleteModal.type === "note" ? "Note" : "Whiteboard"} deleted successfully`, { id: toastId });
             setDeleteModal({ open: false, type: null, id: null, title: "" });
         } catch (e) {
-            alert("Failed to delete content. Please try again.");
+            toast.error(`Failed to delete ${deleteModal.type}. Please try again.`, { id: toastId });
             setDeleteModal({ open: false, type: null, id: null, title: "" });
         }
     };
@@ -235,6 +240,7 @@ export default function WorkspaceDashboard() {
                                             tags={c.tags}
                                             date={c._date}
                                             isFavorite={c._isFav}
+                                            isLive={c._type === "whiteboard" ? activeRooms.includes(c.slug) : undefined}
                                             onToggleFavorite={(e) => {
                                                 if (c._type === "note") toggleNoteFav.mutate(c.id);
                                                 else toggleRoomFav.mutate(c.id);

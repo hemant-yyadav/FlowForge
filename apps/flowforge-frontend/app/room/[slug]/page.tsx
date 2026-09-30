@@ -18,6 +18,14 @@ function RoomCanvasInner() {
     const slug = params.slug as string;
     
     const router = useRouter();
+    const embeddedParam = searchParams.get("embedded");
+    const isEmbedded = embeddedParam === "true";
+    
+    // Debug log to ensure client is re-evaluating
+    useEffect(() => {
+        console.log("RoomCanvas mount - embedded param:", embeddedParam, "isEmbedded:", isEmbedded);
+    }, [embeddedParam, isEmbedded]);
+
     const [token, setToken] = useState<string | null>(null);
     const [initialShapes, setInitialShapes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -43,12 +51,21 @@ function RoomCanvasInner() {
         fetch(`http://localhost:3001/room/${slug}/shapes`, {
             headers: { "Authorization": `Bearer ${storedToken}` }
         })
-        .then(res => {
-            if (res.status === 404) throw new Error("Room not found");
-            if (!res.ok) throw new Error("Failed to fetch");
+        .then(async (res) => {
+            if (res.status === 404) {
+                setError("Room not found");
+                setLoading(false);
+                return null;
+            }
+            if (!res.ok) {
+                setError("Failed to load");
+                setLoading(false);
+                return null;
+            }
             return res.json();
         })
-        .then(data => {
+        .then((data) => {
+            if (!data) return; // Handled above
             if (data.shapes) {
                 // Parse the stringified shape data from DB
                 const parsedShapes = data.shapes.map((s: any) => JSON.parse(s.data));
@@ -58,7 +75,7 @@ function RoomCanvasInner() {
         })
         .catch(err => {
             console.error("Failed to load shapes:", err);
-            setError(err.message === "Room not found" ? "Room not found" : "Failed to load");
+            setError("Failed to load");
             setLoading(false);
         });
     }, [slug, searchParams, router]);
@@ -89,7 +106,7 @@ function RoomCanvasInner() {
                 <h2 style={{ margin: 0 }}>{error === "Room not found" ? "Room Not Found" : "Connection Error"}</h2>
                 <p style={{ color: "#aaa", marginTop: "-10px" }}>This room does not exist. Please create it from the dashboard.</p>
                 <button 
-                    onClick={() => window.location.href = "http://localhost:3000/dashboard"}
+                    onClick={() => window.location.href = "/workspaces"}
                     style={{
                         padding: "10px 20px",
                         background: "#007bff",
@@ -110,24 +127,41 @@ function RoomCanvasInner() {
         return <div style={{ display: "flex", height: "100vh", alignItems: "center", justifyContent: "center", background: "#111", color: "#fff" }}>Loading canvas...</div>;
     }
 
+    if (isEmbedded) {
+        return (
+            <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#111" }}>
+                <CursorOverlay cursors={remoteCursors} />
+                <canvas
+                    ref={canvasRef}
+                    onMouseDown={onMouseDown}
+                    onMouseMove={onMouseMove}
+                    onMouseUp={onMouseUp}
+                    onMouseLeave={onMouseUp}
+                    style={{ display: "block", cursor: "crosshair" }}
+                />
+                {!connected && (
+                    <div style={{ position: "absolute", bottom: 20, right: 20, background: "rgba(255,0,0,0.8)", padding: "8px 16px", borderRadius: "8px", color: "#fff", fontSize: "12px" }}>
+                        Disconnected. Trying to reconnect...
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     return (
         <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#111" }}>
-            {!searchParams.get("embedded") && (
-                <>
-                    <Toolbar currentTool={currentTool} setCurrentTool={setCurrentTool} color={color} setColor={setColor} clearBoard={clearBoard} />
-                    <ChatSidebar chats={chats} sendChat={sendChat} roomUsers={roomUsers} />
-                </>
-            )}
+            <Toolbar currentTool={currentTool} setCurrentTool={setCurrentTool} color={color} setColor={setColor} clearBoard={clearBoard} />
+            <ChatSidebar chats={chats} sendChat={sendChat} roomUsers={roomUsers} />
+            
             <CursorOverlay cursors={remoteCursors} />
             
-            {!searchParams.get("embedded") && (
-                <button
-                    onClick={() => {
+            <button
+                onClick={() => {
                         if (window.opener) {
                             window.close();
                         }
                         // Fallback or if not opened via target=_blank
-                        window.location.href = "http://localhost:3000/dashboard";
+                        window.location.href = "/workspaces";
                     }}
                     style={{
                         position: "absolute",
@@ -152,7 +186,6 @@ function RoomCanvasInner() {
                     <LogOut size={18} />
                     Exit Room
                 </button>
-            )}
 
             <canvas
                 ref={canvasRef}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { drawShape } from "../utils/draw";
 
 export type Shape = any; // We can define exact types later
@@ -21,9 +21,11 @@ export function useCanvas(
     const isDrawing = useRef(false);
     const currentShape = useRef<Shape | null>(null);
 
-    const allShapes = [...initialShapes, ...remoteShapes, ...localShapes].sort((a, b) => {
-        return (a.timestamp || 0) - (b.timestamp || 0);
-    });
+    const allShapes = useMemo(() => {
+        return [...initialShapes, ...remoteShapes, ...localShapes].sort((a, b) => {
+            return (a.timestamp || 0) - (b.timestamp || 0);
+        });
+    }, [initialShapes, remoteShapes, localShapes]);
 
     const redraw = useCallback(() => {
         const canvas = canvasRef.current;
@@ -61,9 +63,8 @@ export function useCanvas(
     useEffect(() => {
         if (clearTrigger > 0) {
             setLocalShapes([]);
-            redraw();
         }
-    }, [clearTrigger, redraw]);
+    }, [clearTrigger]);
 
     const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const rect = canvasRef.current?.getBoundingClientRect();

@@ -91,14 +91,19 @@ export function useWorkspaceRooms(workspaceId: string | null, token: string | nu
 export function useCreateWorkspaceRoom(workspaceId: string | null, token: string | null) {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (name: string) => fetch("http://localhost:3001/room", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ name, workspaceId })
-        }).then(res => res.json()),
+        mutationFn: async (name: string) => {
+            const res = await fetch("http://localhost:3001/room", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, workspaceId })
+            });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.message || "Failed to create room");
+            return json;
+        },
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["workspaceRooms", workspaceId] });
         },

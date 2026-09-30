@@ -9,7 +9,8 @@ export function ContentCard({
     preview, 
     tags = [], 
     date, 
-    isFavorite, 
+    isFavorite,
+    isLive, 
     onToggleFavorite, 
     onClick,
     onDelete
@@ -20,7 +21,8 @@ export function ContentCard({
     preview?: string, 
     tags?: any[], 
     date: string, 
-    isFavorite: boolean, 
+    isFavorite: boolean,
+    isLive?: boolean,
     onToggleFavorite: (e: React.MouseEvent) => void, 
     onClick: () => void,
     onDelete?: (e: React.MouseEvent) => void
@@ -29,9 +31,23 @@ export function ContentCard({
         <div className={styles.noteCard} onClick={onClick}>
             <div className={styles.noteTitleRow}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", minWidth: 0, overflow: "hidden" }}>
-                    <span className={`${styles.badge} ${type === "note" ? styles.badgeNote : styles.badgeWb}`} style={{ flexShrink: 0 }}>
-                        {type}
-                    </span>
+                    {type === "note" ? (
+                        <span className={`${styles.badge} ${styles.badgeNote}`} style={{ flexShrink: 0 }}>
+                            note
+                        </span>
+                    ) : isLive ? (
+                        <span className={`${styles.badge} ${styles.badgeWb}`} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: "6px", background: "rgba(16, 185, 129, 0.15)", color: "#10b981", border: "1px solid rgba(16, 185, 129, 0.3)" }}>
+                            <span style={{ display: "inline-block", width: "6px", height: "6px", background: "#10b981", borderRadius: "50%", animation: "pulse 2s infinite" }} />
+                            Live Meeting
+                            <style>{`
+                                @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+                            `}</style>
+                        </span>
+                    ) : (
+                        <span className={`${styles.badge} ${styles.badgeWb}`} style={{ flexShrink: 0 }}>
+                            whiteboard
+                        </span>
+                    )}
                     <h3 className={styles.noteTitle} style={{ lineHeight: "1.2", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h3>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>

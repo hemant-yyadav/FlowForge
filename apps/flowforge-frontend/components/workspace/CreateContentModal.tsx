@@ -9,10 +9,14 @@ export function CreateContentModal({ workspaceId, token, open, defaultType = "no
     
     const createNote = useCreateNote(workspaceId, token);
     const createRoom = useCreateWorkspaceRoom(workspaceId, token);
+    const [error, setError] = useState<string | null>(null);
 
     // Reset title when opening
     useEffect(() => { 
-        if (open) setTitle(""); 
+        if (open) {
+            setTitle(""); 
+            setError(null);
+        }
     }, [open]);
 
     if (!open) return null;
@@ -20,17 +24,22 @@ export function CreateContentModal({ workspaceId, token, open, defaultType = "no
     async function handleCreate(e: React.FormEvent) {
         e.preventDefault();
         if (!title.trim()) return;
+        setError(null);
 
-        if (type === "note") {
-            const res = await createNote.mutateAsync({ title: title.trim(), content: { text: "" } });
-            onNoteCreated(res.note.id, res.note.title, "note");
-            onClose();
-        } else {
-            const res = await createRoom.mutateAsync(title.trim());
-            if (res.slug) {
-                onNoteCreated(res.slug, res.slug, "whiteboard");
+        try {
+            if (type === "note") {
+                const res = await createNote.mutateAsync({ title: title.trim(), content: { text: "" } });
+                onNoteCreated(res.note.id, res.note.title, "note");
                 onClose();
+            } else {
+                const res = await createRoom.mutateAsync(title.trim());
+                if (res.slug) {
+                    onNoteCreated(res.slug, res.slug, "whiteboard");
+                    onClose();
+                }
             }
+        } catch (err: any) {
+            setError(err.message || "Something went wrong");
         }
     }
 
@@ -54,6 +63,11 @@ export function CreateContentModal({ workspaceId, token, open, defaultType = "no
                             autoFocus 
                             required 
                         />
+                        {error && (
+                            <div style={{ color: "var(--danger)", fontSize: "0.85rem", marginTop: "8px", background: "rgba(239, 68, 68, 0.1)", padding: "8px", borderRadius: "6px" }}>
+                                {error}
+                            </div>
+                        )}
                     </div>
                     <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
                         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>

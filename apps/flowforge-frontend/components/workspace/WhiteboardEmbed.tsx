@@ -36,11 +36,11 @@ export function WhiteboardEmbed({ slug, inline = false }: { slug: string, inline
         if (intervalRef.current) clearInterval(intervalRef.current);
     };
 
-    const height = inline ? "500px" : "calc(100vh - 120px)";
+    const height = inline ? "100%" : "calc(100vh - 120px)";
 
     if (isPoppedOut) {
         return (
-            <div style={{ position: "relative", width: "100%", height, borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border)", animation: "fadeIn 0.3s ease", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg-card)", margin: inline ? "24px 0" : 0 }}>
+            <div style={{ position: "relative", width: "100%", height, borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border)", animation: "fadeIn 0.3s ease", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg-card)", margin: 0 }}>
                 <MonitorUp size={64} color="var(--accent)" style={{ marginBottom: "24px", opacity: 0.8 }} />
                 <h3 style={{ margin: "0 0 12px 0", color: "var(--text-primary)" }}>Whiteboard popped out</h3>
                 <p style={{ color: "var(--text-muted)", marginBottom: "24px" }}>This whiteboard is currently opened in a new tab.</p>
@@ -52,7 +52,7 @@ export function WhiteboardEmbed({ slug, inline = false }: { slug: string, inline
     }
 
     return (
-        <div style={{ position: "relative", width: "100%", height, borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border)", animation: "fadeIn 0.3s ease", margin: inline ? "24px 0" : 0 }}>
+        <div style={{ position: "relative", width: "100%", height, borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border)", animation: "fadeIn 0.3s ease", margin: 0, display: "flex", flexDirection: "column" }}>
             {!inline && (
                 <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
                     <button 
@@ -85,7 +85,7 @@ export function WhiteboardEmbed({ slug, inline = false }: { slug: string, inline
                     </button>
                 </div>
             )}
-            <iframe src={`/room/${slug}?embedded=true`} style={{ width: "100%", height: "100%", border: "none" }} />
+            <iframe src={`/room/${slug}?embedded=true`} style={{ width: "100%", height: "100%", border: "none", flex: 1 }} />
         </div>
     );
 }

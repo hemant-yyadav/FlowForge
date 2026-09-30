@@ -28,7 +28,7 @@ const WhiteboardBlock = createReactBlockSpec(
   {
     render: (props) => {
       return (
-        <div style={{ margin: "24px 0", border: "1px solid var(--border)", borderRadius: "12px", overflow: "hidden", background: "var(--bg-primary)", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }} contentEditable={false}>
+        <div style={{ margin: "24px 0", border: "1px solid var(--border)", borderRadius: "12px", overflow: "hidden", background: "var(--bg-primary)", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", display: "block", width: "100%" }} contentEditable={false}>
             <div style={{ background: "var(--bg-card)", padding: "12px 16px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: "0.9rem", fontWeight: "bold", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "8px" }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -41,9 +41,8 @@ const WhiteboardBlock = createReactBlockSpec(
                     Open Canvas
                 </button>
             </div>
-            <div style={{ height: "300px", position: "relative", pointerEvents: "none", overflow: "hidden" }}>
-                {/* Scaled down container to simulate a thumbnail preview without squishing */}
-                <div style={{ width: "200%", height: "200%", transform: "scale(0.5)", transformOrigin: "top left", position: "absolute", top: 0, left: 0 }}>
+            <div style={{ height: "400px", minHeight: "200px", maxHeight: "1000px", resize: "vertical", overflow: "hidden", position: "relative", paddingBottom: "10px" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 10, pointerEvents: "none" }}>
                     <WhiteboardEmbed slug={props.block.props.slug} inline={true} />
                 </div>
             </div>
@@ -133,7 +132,7 @@ export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, works
     const availableRooms = allWorkspaceRooms.filter((r: any) => !attachedRoomIds.has(r.id));
 
     return (
-        <div style={{ maxWidth: "900px", margin: "0 auto", padding: "24px 0", animation: "fadeIn 0.3s ease", display: "flex", flexDirection: "column", height: "100%" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto", padding: "24px 0", animation: "fadeIn 0.3s ease", display: "flex", flexDirection: "column", minHeight: "100%" }}>
             <input 
                 value={localTitle} 
                 onChange={e => setLocalTitle(e.target.value)}
@@ -166,7 +165,7 @@ export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, works
                 </div>
             </div>
             
-            <div style={{ flex: 1, minHeight: "400px", marginBottom: "32px", background: "var(--bg-card)", borderRadius: "12px", border: "1px solid var(--border)", padding: "24px 0", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+            <div style={{ minHeight: "400px", marginBottom: "32px", background: "var(--bg-card)", borderRadius: "12px", border: "1px solid var(--border)", padding: "24px 0", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
                 {editorReady && (
                     <BlockNoteView 
                         editor={editor as any} 

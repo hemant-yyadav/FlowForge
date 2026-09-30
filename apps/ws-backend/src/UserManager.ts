@@ -27,3 +27,11 @@ export function findUser(ws: WebSocket): User | undefined {
 export function getUsersInRoom(roomId: string): User[] {
     return users.filter((u) => u.rooms.includes(roomId));
 }
+
+export function getActiveRooms(): string[] {
+    const activeRooms = new Set<string>();
+    users.forEach(u => {
+        u.rooms.forEach(r => activeRooms.add(r));
+    });
+    return Array.from(activeRooms);
+}

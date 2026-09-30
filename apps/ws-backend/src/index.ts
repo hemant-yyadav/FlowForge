@@ -1,6 +1,7 @@
 import { WebSocketServer } from "ws";
+import { createServer } from "http";
 import { checkUser } from "@repo/backend-common/auth";
-import { addUser, removeUser, findUser } from "./UserManager.js";
+import { addUser, removeUser, findUser, getActiveRooms } from "./UserManager.js";
 import { handleJoinRoom } from "./handlers/joinHandler.js";
 import { handleLeaveRoom } from "./handlers/leaveHandler.js";
 import { handleChat } from "./handlers/chatHandler.js";
@@ -13,7 +14,29 @@ import { config } from "dotenv";
 
 config({ path: path.resolve(__dirname, "../../../.env") });
 
-const wss = new WebSocketServer({ port: 8080 });
+const server = createServer((req, res) => {
+    // Basic CORS
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    
+    if (req.method === "OPTIONS") {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
+    if (req.method === "GET" && req.url === "/api/active-rooms") {
+        const activeRooms = getActiveRooms();
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ activeRooms }));
+        return;
+    }
+    
+    res.writeHead(404);
+    res.end();
+});
+
+const wss = new WebSocketServer({ server });
 
 import { prismaClient } from "db";
 
@@ -103,4 +126,8 @@ wss.on("connection", async function connection(ws, request) {
             rooms.forEach(roomId => broadcastRoomUsers(roomId));
         }
     });
+});
+
+server.listen(8080, () => {
+    console.log("WebSocket and HTTP server running on port 8080");
 });
