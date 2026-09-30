@@ -9,13 +9,15 @@ datasource db {
 model User {
   id       String    @id @default(uuid())
   username String    @unique
-  password String
-  name     String
-  chats    Chat[]
-  rooms    Room[]
-  shapes   Shape[]
-  email    String?
-  photo    String?
+  password   String?
+  name       String
+  chats      Chat[]
+  rooms      Room[]
+  shapes     Shape[]
+  email      String?   @unique
+  photo      String?
+  provider   String?   // "google", "github", etc.
+  providerId String?   // OAuth account ID
 }
 
 model Room {

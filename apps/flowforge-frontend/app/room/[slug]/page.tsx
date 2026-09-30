@@ -21,6 +21,7 @@ function RoomCanvasInner() {
     const [token, setToken] = useState<string | null>(null);
     const [initialShapes, setInitialShapes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         let storedToken = localStorage.getItem("token");
@@ -57,6 +58,7 @@ function RoomCanvasInner() {
         })
         .catch(err => {
             console.error("Failed to load shapes:", err);
+            setError(err.message === "Room not found" ? "Room not found" : "Failed to load");
             setLoading(false);
         });
     }, [slug, searchParams, router]);
@@ -80,6 +82,29 @@ function RoomCanvasInner() {
         setColor,
         clearBoard
     } = useCanvas(initialShapes, remoteShapes, sendDraw, sendCursor, sendClearBoard, () => setInitialShapes([]), clearTrigger);
+
+    if (error) {
+        return (
+            <div style={{ display: "flex", flexDirection: "column", height: "100vh", alignItems: "center", justifyContent: "center", background: "#111", color: "#fff", gap: "20px" }}>
+                <h2 style={{ margin: 0 }}>{error === "Room not found" ? "Room Not Found" : "Connection Error"}</h2>
+                <p style={{ color: "#aaa", marginTop: "-10px" }}>This room does not exist. Please create it from the dashboard.</p>
+                <button 
+                    onClick={() => window.location.href = "http://localhost:3000/dashboard"}
+                    style={{
+                        padding: "10px 20px",
+                        background: "#007bff",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontWeight: "bold"
+                    }}
+                >
+                    Go to Dashboard
+                </button>
+            </div>
+        );
+    }
 
     if (loading) {
         return <div style={{ display: "flex", height: "100vh", alignItems: "center", justifyContent: "center", background: "#111", color: "#fff" }}>Loading canvas...</div>;

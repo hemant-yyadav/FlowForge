@@ -39,6 +39,10 @@ export async function signin(req: Request, res: Response) {
         res.status(403).json({ message: "Invalid credentials" });
         return;
     }
+    if (!user.password) {
+        res.status(403).json({ message: "Please sign in with your connected OAuth provider (e.g., Google or GitHub)" });
+        return;
+    }
     const isPasswordCorrect = await bcrypt.compare(parsedData.data.password, user.password);
     if (!isPasswordCorrect) {
         res.status(403).json({ message: "Invalid credentials" });
@@ -46,4 +50,49 @@ export async function signin(req: Request, res: Response) {
     }
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     res.json({ token });
+}
+
+export async function oauthSignin(req: Request, res: Response) {
+    // This endpoint should only be called securely from the Next.js API route
+    // after successful OAuth verification.
+    const { email, name, provider, providerId } = req.body;
+
+    if (!email || !provider || !providerId) {
+        res.status(400).json({ message: "Missing required OAuth fields" });
+        return;
+    }
+
+    try {
+        let user = await prismaClient.user.findFirst({
+            where: { email },
+        });
+
+        if (!user) {
+            // Generate a random unique username
+            const randomSuffix = Math.floor(Math.random() * 1000000).toString();
+            const generatedUsername = `${name.split(' ')[0].toLowerCase()}_${randomSuffix}`;
+            
+            user = await prismaClient.user.create({
+                data: {
+                    username: generatedUsername,
+                    name: name || "OAuth User",
+                    email,
+                    provider,
+                    providerId,
+                },
+            });
+        } else if (!user.provider) {
+            // If the user exists but hasn't linked OAuth yet, link it
+            user = await prismaClient.user.update({
+                where: { id: user.id },
+                data: { provider, providerId },
+            });
+        }
+
+        const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+        res.json({ token, userId: user.id });
+    } catch (error) {
+        console.error("OAuth signin error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 }

@@ -47,23 +47,14 @@ export async function getRoom(req: Request, res: Response): Promise<void> {
 export async function getShapes(req: Request, res: Response): Promise<void> {
     const slug = req.params.slug as string;
     try {
-        let room = await prismaClient.room.findUnique({
+        const room = await prismaClient.room.findUnique({
             where: { slug },
-            include: {
-                shapes: true
-            }
+            include: { shapes: true }
         });
 
         if (!room) {
-            const userId = req.userId;
-            if (!userId) {
-                res.status(401).json({ message: "Unauthorized" });
-                return;
-            }
-            room = await prismaClient.room.create({
-                data: { slug, adminId: userId },
-                include: { shapes: true }
-            });
+            res.status(404).json({ message: "Room not found" });
+            return;
         }
 
         res.json({ shapes: room.shapes });
