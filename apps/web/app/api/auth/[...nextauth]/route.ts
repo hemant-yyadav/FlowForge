@@ -46,8 +46,9 @@ const handler = NextAuth({
         },
         async session({ session, token }) {
             // Send the custom JWT to the client
-            (session as any).customJwt = token.customJwt;
-            return session;
+            const customSession = session as typeof session & { customJwt?: string | unknown };
+            customSession.customJwt = token.customJwt;
+            return customSession;
         },
     },
 });

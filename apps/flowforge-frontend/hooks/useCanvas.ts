@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { drawShape } from "../utils/draw";
 
 export type Shape = any; // We can define exact types later
@@ -25,7 +25,7 @@ export function useCanvas(
         return (a.timestamp || 0) - (b.timestamp || 0);
     });
 
-    const redraw = () => {
+    const redraw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
@@ -37,7 +37,7 @@ export function useCanvas(
         if (currentShape.current) {
             drawShape(ctx, currentShape.current);
         }
-    };
+    }, [allShapes]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -51,19 +51,19 @@ export function useCanvas(
         handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, [initialShapes, remoteShapes, localShapes]);
+    }, [initialShapes, remoteShapes, localShapes, redraw]);
 
     // Re-draw when shapes change
     useEffect(() => {
         redraw();
-    }, [initialShapes, remoteShapes, localShapes]);
+    }, [initialShapes, remoteShapes, localShapes, redraw]);
 
     useEffect(() => {
         if (clearTrigger > 0) {
             setLocalShapes([]);
             redraw();
         }
-    }, [clearTrigger]);
+    }, [clearTrigger, redraw]);
 
     const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const rect = canvasRef.current?.getBoundingClientRect();
