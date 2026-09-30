@@ -35,7 +35,7 @@ model Workspace {
   name        String
   description String?
   ownerId     String
-  owner       User              @relation(fields: [ownerId], references: [id])
+  owner       User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   isPublic    Boolean           @default(false)
   
   members     WorkspaceMember[]
@@ -64,7 +64,7 @@ model Room {
   slug      String   @unique
   createdAt DateTime @default(now())
   adminId   String
-  admin     User     @relation(fields: [adminId], references: [id])
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
   chats     Chat[]
   shapes    Shape[]
 
@@ -79,8 +79,8 @@ model Chat {
   roomId  Int
   message String
   userId  String
-  room    Room   @relation(fields: [roomId], references: [id])
-  user    User   @relation(fields: [userId], references: [id])
+  room    Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Shape {
@@ -90,8 +90,8 @@ model Shape {
   data      String
   userId    String
   createdAt DateTime @default(now())
-  room      Room     @relation(fields: [roomId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Note {
@@ -103,7 +103,7 @@ model Note {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   
   userId      String    // Author
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

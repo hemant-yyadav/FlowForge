@@ -13,5 +13,6 @@ export const SigninSchema = z.object({
 
 export const CreateRoomSchema = z.object({
     name : z.string().min(3).max(20),
-    password : z.string().min(6).max(10),
+    password : z.string().min(6).max(10).optional(),
+    workspaceId: z.string().optional()
 })

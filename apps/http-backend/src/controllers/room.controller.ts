@@ -19,9 +19,10 @@ export async function createRoom(req: Request, res: Response) {
             data: {
                 slug: parsedData.data.name,
                 adminId: userId,
+                workspaceId: parsedData.data.workspaceId || null,
             },
         });
-        res.json({ roomId: room.id });
+        res.json({ roomId: room.id, slug: room.slug });
     } catch {
         res.status(409).json({ message: "Room already exists" });
     }
