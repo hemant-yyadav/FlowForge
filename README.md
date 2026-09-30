@@ -1,159 +1,99 @@
-# Turborepo starter
+# FlowForge
 
-This Turborepo starter is maintained by the Turborepo core team.
+FlowForge is a real-time collaborative workspace application that combines the power of Notion-style rich text editing with interactive, collaborative whiteboarding. Built for modern teams, FlowForge allows you to take notes, create dynamic whiteboards, and seamlessly embed live, interactive whiteboard sessions directly into your documentation.
 
-## Using this example
+## Features
 
-Run the following command:
+- **Rich Text WYSIWYG Editor**: A Notion-like note-taking experience powered by BlockNote. Format text on the fly, use slash commands (`/`), and structure your thoughts beautifully.
+- **Real-Time Collaborative Whiteboards**: Infinite canvas whiteboards for brainstorming, diagramming, and visual collaboration. Multiple users can draw and interact in real-time, complete with a live chat sidebar and multiplayer cursors.
+- **Embedded Whiteboard Blocks**: Bring your documentation to life. Embed live whiteboards directly inside your notes as visual, interactive blocks instead of static images or text links.
+- **Workspaces & Organization**: Organize your team's notes and rooms into dedicated workspaces.
+- **Real-Time Sync**: Powered by WebSockets to ensure that every stroke, chat message, and cursor movement is instantly synchronized across all clients.
 
-```sh
-npx create-turbo@latest
+## Tech Stack
+
+This project is built using a modern, scalable monorepo architecture powered by **Turborepo**.
+
+### Frontend (`apps/flowforge-frontend`)
+- **Next.js**: React framework for the user interface and server-side rendering.
+- **BlockNote**: ProseMirror-based WYSIWYG editor for the rich text note-taking experience.
+- **Tailwind / Vanilla CSS**: For sleek, modern, and responsive UI components.
+
+### Backend 
+- **HTTP Backend (`apps/http-backend`)**: Node.js & Express REST API for handling authentication, workspace management, and database operations.
+- **WebSocket Backend (`apps/ws-backend`)**: Node.js & `ws` server for handling low-latency, real-time multiplayer drawing and chat.
+- **Prisma**: Next-generation Node.js and TypeScript ORM for interacting with the database.
+- **PostgreSQL**: Primary relational database.
+
+## Project Structure
+
+```text
+my-turborepo/
+├── apps/
+│   ├── flowforge-frontend/   # Next.js web application
+│   ├── http-backend/         # Express REST API
+│   └── ws-backend/           # WebSocket server for real-time collaboration
+├── packages/
+│   ├── db/                   # Shared Prisma database schema and client
+│   ├── backend-common/       # Shared backend utilities, types, and JWT logic
+│   ├── common/               # Shared constants and configurations
+│   ├── eslint-config/        # Shared ESLint configurations
+│   ├── typescript-config/    # Shared tsconfig configurations
+│   └── ui/                   # Shared React UI components
+└── package.json
 ```
 
-## What's inside?
+## Getting Started
 
-This Turborepo includes the following packages/apps:
+### Prerequisites
 
-### Apps and Packages
+- Node.js (v18 or higher)
+- `pnpm` package manager
+- PostgreSQL database
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Installation
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/16215harsh/FlowForge.git
+   cd FlowForge/my-turborepo
+   ```
 
-### Utilities
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
 
-This Turborepo has some additional tools already setup for you:
+3. **Set up the Database:**
+   Ensure you have a running PostgreSQL database. Create a `.env` file in `packages/db` and define your `DATABASE_URL`.
+   ```bash
+   cd packages/db
+   npx prisma migrate dev
+   ```
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+4. **Environment Variables:**
+   You will need to set up `.env` files for the frontend and backends containing necessary secrets like `JWT_SECRET`, database URLs, and API endpoints (e.g., pointing the frontend to `http://localhost:3001` for HTTP and `ws://localhost:8080` for WebSockets).
 
-### Build
+### Running the App
 
-To build all apps and packages, run the following command:
+To start all applications (frontend, http-backend, and ws-backend) simultaneously in development mode, run:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+pnpm run dev
 ```
 
-Without global `turbo`, use your package manager:
+- The **Frontend** will be available at `http://localhost:3000`
+- The **HTTP API** will be running on `http://localhost:3001`
+- The **WebSocket Server** will be running on `ws://localhost:8080`
 
-```sh
-cd my-turborepo
+## Building for Production
+
+To build all apps and packages for production, use Turborepo's build command:
+
+```bash
 npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## License
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+This project is licensed under the MIT License.
