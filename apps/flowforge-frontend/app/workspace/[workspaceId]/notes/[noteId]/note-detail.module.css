@@ -1,0 +1,268 @@
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+.backBtn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 8px 0;
+    margin-bottom: 24px;
+    display: inline-block;
+    transition: color 0.2s ease;
+}
+
+.backBtn:hover {
+    color: var(--accent);
+}
+
+.noteHeader {
+    margin-bottom: 32px;
+}
+
+.noteTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.noteMeta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.sectionTitle {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px 0;
+}
+
+.contentSection {
+    margin-bottom: 32px;
+}
+
+.contentBody {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    min-height: 80px;
+}
+
+.tagsSection {
+    margin-bottom: 32px;
+}
+
+.tagsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    display: inline-block;
+    background: var(--bg-input);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.whiteboardsSection {
+    margin-bottom: 32px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.sectionHeader .sectionTitle {
+    margin-bottom: 0;
+}
+
+.attachBtn {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.attachBtn:hover {
+    background: rgba(82, 136, 193, 0.1);
+}
+
+.attachPanel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.attachLabel {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0 0 12px 0;
+}
+
+.roomOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.roomOption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.roomOption:hover {
+    border-color: var(--accent);
+}
+
+.roomOption input[type="radio"] {
+    accent-color: var(--accent);
+}
+
+.roomOptionLabel {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.noRooms {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 16px 0;
+}
+
+.roomCards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.roomCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    transition: all 0.2s ease;
+}
+
+.roomCard:hover {
+    border-color: var(--accent);
+}
+
+.roomCardInfo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+}
+
+.roomIcon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.roomName {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.roomDate {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.removeBtn {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 1rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.roomCard:hover .removeBtn {
+    opacity: 1;
+}
+
+.removeBtn:hover {
+    color: var(--error);
+    background: rgba(229, 57, 53, 0.1);
+}
+
+.emptyWhiteboards {
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+}
+
+.emptyHint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.loading {
+    text-align: center;
+    padding: 64px 24px;
+    color: var(--text-muted);
+}
+
+.loadingSmall {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.errorState {
+    text-align: center;
+    padding: 64px 24px;
+    color: var(--error);
+}

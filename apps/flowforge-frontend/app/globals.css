@@ -34,6 +34,10 @@
   --bubble-other: #182533;
   --bubble-other-text: #ffffff;
   --bubble-shadow: rgba(0,0,0,0.2);
+
+  /* Sidebar Layout */
+  --sidebar-expanded-width: 260px;
+  --sidebar-collapsed-width: 64px;
 }
 
 [data-theme='light'] {
@@ -143,3 +147,37 @@ input, textarea {
   font-size: 0.85rem;
   margin-top: 8px;
 }
+
+/* Sidebar & Glassmorphism Utilities */
+.glass-sidebar {
+  background: var(--bg-card);
+  background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border);
+}
+
+.theme-toggle-pill {
+  display: flex;
+  background: var(--bg-input);
+  border-radius: 20px;
+  padding: 4px;
+  border: 1px solid var(--border);
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 16px;
+  background: transparent;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.theme-toggle-btn.active {
+  background: var(--bg-card);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
