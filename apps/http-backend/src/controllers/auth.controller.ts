@@ -57,32 +57,44 @@ export async function oauthSignin(req: Request, res: Response) {
     // after successful OAuth verification.
     const { email, name, provider, providerId } = req.body;
 
-    if (!email || !provider || !providerId) {
+    if (!provider || !providerId) {
         res.status(400).json({ message: "Missing required OAuth fields" });
         return;
     }
 
     try {
-        let user = await prismaClient.user.findFirst({
-            where: { email },
+        let user = null;
+        
+        // Try to find existing user by provider and providerId first
+        user = await prismaClient.user.findFirst({
+            where: { provider, providerId },
         });
+
+        // Fallback: If no provider match, try matching by email if it exists
+        if (!user && email) {
+            user = await prismaClient.user.findFirst({
+                where: { email },
+            });
+        }
 
         if (!user) {
             // Generate a random unique username
             const randomSuffix = Math.floor(Math.random() * 1000000).toString();
-            const generatedUsername = `${name.split(' ')[0].toLowerCase()}_${randomSuffix}`;
+            // Name could also be null if not set on GitHub
+            const safeName = name || "OAuth User";
+            const generatedUsername = `${safeName.split(' ')[0].toLowerCase()}_${randomSuffix}`;
             
             user = await prismaClient.user.create({
                 data: {
                     username: generatedUsername,
-                    name: name || "OAuth User",
-                    email,
+                    name: safeName,
+                    email: email || null,
                     provider,
                     providerId,
                 },
             });
         } else if (!user.provider) {
-            // If the user exists but hasn't linked OAuth yet, link it
+            // If the user exists (matched by email) but hasn't linked OAuth yet, link it
             user = await prismaClient.user.update({
                 where: { id: user.id },
                 data: { provider, providerId },

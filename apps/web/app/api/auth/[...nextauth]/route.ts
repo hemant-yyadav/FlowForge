@@ -35,7 +35,8 @@ const handler = NextAuth({
                         const data = await res.json();
                         token.customJwt = data.token;
                     } else {
-                        console.error("Failed to authenticate with custom backend");
+                        const errText = await res.text();
+                        console.error("Failed to authenticate with custom backend:", res.status, errText);
                     }
                 } catch (error) {
                     console.error("Error during OAuth exchange:", error);

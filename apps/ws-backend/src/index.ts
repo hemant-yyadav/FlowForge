@@ -44,6 +44,7 @@ wss.on("connection", async function connection(ws, request) {
         const user = findUser(ws);
         if (user) {
             user.name = dbUser.name;
+            user.rooms.forEach(roomId => broadcastRoomUsers(roomId));
         }
     }).catch(console.error);
 

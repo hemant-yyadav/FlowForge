@@ -18,6 +18,41 @@ model User {
   photo      String?
   provider   String?   // "google", "github", etc.
   providerId String?   // OAuth account ID
+
+  ownedWorkspaces Workspace[]
+  memberships     WorkspaceMember[]
+}
+
+enum Role {
+  EDITOR
+  VIEWER
+}
+
+model Workspace {
+  id          String            @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User              @relation(fields: [ownerId], references: [id])
+  isPublic    Boolean           @default(false)
+  
+  members     WorkspaceMember[]
+  rooms       Room[]
+  
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        Role      @default(VIEWER)
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
 }
 
 model Room {
@@ -28,6 +63,9 @@ model Room {
   admin     User     @relation(fields: [adminId], references: [id])
   chats     Chat[]
   shapes    Shape[]
+
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model Chat {

@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+import { signOut } from "next-auth/react";
+
 export default function OAuthCallbackPage() {
     const router = useRouter();
 
@@ -17,12 +19,13 @@ export default function OAuthCallbackPage() {
                     router.push("/dashboard");
                 } else {
                     console.error("No custom JWT found in session");
-                    router.push("/signin");
+                    // Clear the broken NextAuth session so the user can try again
+                    signOut({ callbackUrl: "/signin" });
                 }
             })
             .catch(err => {
                 console.error("Failed to fetch session:", err);
-                router.push("/signin");
+                signOut({ callbackUrl: "/signin" });
             });
     }, [router]);
 
