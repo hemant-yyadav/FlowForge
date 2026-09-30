@@ -21,6 +21,7 @@ model User {
 
   ownedWorkspaces Workspace[]
   memberships     WorkspaceMember[]
+  notes           Note[]
 }
 
 enum Role {
@@ -38,6 +39,7 @@ model Workspace {
   
   members     WorkspaceMember[]
   rooms       Room[]
+  notes       Note[]
   
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
@@ -86,4 +88,22 @@ model Shape {
   createdAt DateTime @default(now())
   room      Room     @relation(fields: [roomId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Note {
+  id          String    @id @default(uuid())
+  title       String
+  content     Json      // Stored as generic JSON for future compatibility
+  
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
+  userId      String    // Author
+  user        User      @relation(fields: [userId], references: [id])
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId])
+  @@index([userId])
 }
