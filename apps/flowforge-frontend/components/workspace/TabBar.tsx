@@ -1,5 +1,5 @@
 "use client";
-import { X, LayoutDashboard, FileText, Edit3 } from "lucide-react";
+import { X, LayoutDashboard, FileText, Edit3, Settings } from "lucide-react";
 import styles from "./components.module.css";
 import { WorkspaceTab } from "../../hooks/useTabManager";
 
@@ -11,8 +11,9 @@ export function TabBar({ tabs, activeTabId, onTabClick, onTabClose }: { tabs: Wo
                     {tab.type === "dashboard" && <LayoutDashboard size={16} />}
                     {tab.type === "note" && <FileText size={16} />}
                     {tab.type === "whiteboard" && <Edit3 size={16} />}
+                    {tab.type === "settings" && <Settings size={16} />}
                     {tab.title}
-                    {tab.id !== "dashboard" && (
+                    {tab.id !== "dashboard" && tab.id !== "settings" && (
                         <span className={styles.tabClose} onClick={(e) => { e.stopPropagation(); onTabClose(tab.id); }}>
                             <X size={14} />
                         </span>

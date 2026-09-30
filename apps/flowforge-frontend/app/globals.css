@@ -122,6 +122,27 @@ input, textarea {
   transform: none;
 }
 
+.btn-secondary {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
 .input-field {
   width: 100%;
   padding: 12px 16px;

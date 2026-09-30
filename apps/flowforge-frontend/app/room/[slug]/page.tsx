@@ -112,8 +112,12 @@ function RoomCanvasInner() {
 
     return (
         <div style={{ position: "relative", width: "100vw", height: "100vh", overflow: "hidden", background: "#111" }}>
-            <Toolbar currentTool={currentTool} setCurrentTool={setCurrentTool} color={color} setColor={setColor} clearBoard={clearBoard} />
-            <ChatSidebar chats={chats} sendChat={sendChat} roomUsers={roomUsers} />
+            {!searchParams.get("embedded") && (
+                <>
+                    <Toolbar currentTool={currentTool} setCurrentTool={setCurrentTool} color={color} setColor={setColor} clearBoard={clearBoard} />
+                    <ChatSidebar chats={chats} sendChat={sendChat} roomUsers={roomUsers} />
+                </>
+            )}
             <CursorOverlay cursors={remoteCursors} />
             
             {!searchParams.get("embedded") && (

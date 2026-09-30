@@ -1,0 +1,92 @@
+
+> dev
+> turbo run dev
+
+• turbo 2.9.16
+
+   • Packages in scope: @repo/backend-common, @repo/common, @repo/eslint-config, @repo/typescript-config, @repo/ui, db, flowforge-frontend, http-backend, web, ws-backend
+   • Running dev in 10 packages
+   • Remote caching disabled
+
+flowforge-frontend:dev: cache bypass, force executing e1c60892d69c9ab8
+web:dev: cache bypass, force executing 11f86be0c8b19ade
+db:dev: cache bypass, force executing dd029faab4865816
+@repo/common:dev: cache bypass, force executing 1097330c549dc054
+@repo/backend-common:dev: cache bypass, force executing 5ca096ccde14df61
+http-backend:dev: cache bypass, force executing 5277cf0d831a2993
+ws-backend:dev: cache bypass, force executing 82bba496b2c754e7
+Shutting down Turborepo tasks...
+db:dev: Scope: all 11 workspace projects
+@repo/common:dev: Scope: all 11 workspace projects
+db:dev: (node:7664) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+db:dev: (Use `node --trace-deprecation ...` to show where the warning was created)
+@repo/common:dev: (node:7665) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+@repo/common:dev: (Use `node --trace-deprecation ...` to show where the warning was created)
+db:dev:  ENOENT  ENOENT: no such file or directory, unlink '/Users/harsh/Documents/web development jouney/FlowForge/my-turborepo/node_modules/.pnpm/node_modules/@types/node'
+db:dev: 
+db:dev: pnpm: ENOENT: no such file or directory, unlink '/Users/harsh/Documents/web development jouney/FlowForge/my-turborepo/node_modules/.pnpm/node_modules/@types/node'
+db:dev:     at async Object.unlink (node:internal/fs/promises:1058:10)
+db:dev:     at async symlinkHoistedDependency (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137679:7)
+db:dev:     at async Promise.all (index 0)
+db:dev:     at async /Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137645:9
+db:dev:     at async Promise.all (index 10)
+db:dev:     at async symlinkHoistedDependencies (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137631:7)
+db:dev:     at async hoist (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137506:7)
+db:dev:     at async headlessInstall (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:173364:36)
+db:dev:     at async _install (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:180962:33)
+db:dev:     at async mutateModules (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:180828:23)
+@repo/common:dev:  ENOENT  ENOENT: no such file or directory, unlink '/Users/harsh/Documents/web development jouney/FlowForge/my-turborepo/node_modules/.pnpm/node_modules/react'
+@repo/common:dev: 
+@repo/common:dev: pnpm: ENOENT: no such file or directory, unlink '/Users/harsh/Documents/web development jouney/FlowForge/my-turborepo/node_modules/.pnpm/node_modules/react'
+@repo/common:dev:     at async Object.unlink (node:internal/fs/promises:1058:10)
+@repo/common:dev:     at async symlinkHoistedDependency (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137679:7)
+@repo/common:dev:     at async Promise.all (index 0)
+@repo/common:dev:     at async /Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137645:9
+@repo/common:dev:     at async Promise.all (index 17)
+@repo/common:dev:     at async symlinkHoistedDependencies (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137631:7)
+@repo/common:dev:     at async hoist (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:137506:7)
+@repo/common:dev:     at async headlessInstall (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:173364:36)
+@repo/common:dev:     at async _install (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:180962:33)
+@repo/common:dev:     at async mutateModules (/Users/harsh/Library/pnpm/store/v11/links/@/pnpm/9.0.0/f9ad1512405e2d6d9268c6cb24c498bcd91688adc2ba2b2f92d8168e22de7c17/node_modules/pnpm/dist/pnpm.cjs:180828:23)
+db:dev: 
+db:dev:    ╭──────────────────────────────────────────────────────────────────╮
+db:dev:    │                                                                  │
+db:dev:    │                Update available! 9.0.0 → 11.9.0.                 │
+db:dev:    │   Changelog: https://github.com/pnpm/pnpm/releases/tag/v11.9.0   │
+db:dev:    │                Run "pnpm add -g pnpm" to update.                 │
+db:dev:    │                                                                  │
+db:dev:    │      Follow @pnpmjs for updates: https://twitter.com/pnpmjs      │
+db:dev:    │                                                                  │
+db:dev:    ╰──────────────────────────────────────────────────────────────────╯
+db:dev: 
+@repo/common:dev: [ERROR] Command failed with exit code 254: /opt/homebrew/Cellar/node/25.5.0/bin/node /Users/harsh/node_modules/pnpm/bin/pnpm.mjs install
+@repo/common:dev: 
+@repo/common:dev: pnpm: Command failed with exit code 254: /opt/homebrew/Cellar/node/25.5.0/bin/node /Users/harsh/node_modules/pnpm/bin/pnpm.mjs install
+@repo/common:dev:     at getFinalError (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:29514:14)
+@repo/common:dev:     at makeError (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:31821:21)
+@repo/common:dev:     at getSyncResult (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:33665:10)
+@repo/common:dev:     at spawnSubprocessSync (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:33625:14)
+@repo/common:dev:     at execaCoreSync (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:33555:23)
+@repo/common:dev:     at callBoundExeca (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:36083:23)
+@repo/common:dev:     at boundExeca (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:36060:49)
+@repo/common:dev:     at sync (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:36219:10)
+@repo/common:dev:     at runPnpmCli (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:213566:5)
+@repo/common:dev:     at runDepsStatusCheck (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:215280:7)
+db:dev: [ERROR] Command failed with exit code 254: /opt/homebrew/Cellar/node/25.5.0/bin/node /Users/harsh/node_modules/pnpm/bin/pnpm.mjs install
+db:dev: 
+db:dev: pnpm: Command failed with exit code 254: /opt/homebrew/Cellar/node/25.5.0/bin/node /Users/harsh/node_modules/pnpm/bin/pnpm.mjs install
+db:dev:     at getFinalError (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:29514:14)
+db:dev:     at makeError (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:31821:21)
+db:dev:     at getSyncResult (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:33665:10)
+db:dev:     at spawnSubprocessSync (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:33625:14)
+db:dev:     at execaCoreSync (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:33555:23)
+db:dev:     at callBoundExeca (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:36083:23)
+db:dev:     at boundExeca (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:36060:49)
+db:dev:     at sync (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:36219:10)
+db:dev:     at runPnpmCli (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:213566:5)
+db:dev:     at runDepsStatusCheck (file:///Users/harsh/node_modules/.pnpm/pnpm@11.3.0/node_modules/pnpm/dist/pnpm.mjs:215280:7)
+
+ Tasks:    0 successful, 7 total
+Cached:    0 cached, 7 total
+  Time:    4.84s 
+

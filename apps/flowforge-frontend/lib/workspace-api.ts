@@ -2,6 +2,7 @@ import { HTTP_URL } from "../config";
 
 async function authFetch(url: string, token: string, options: RequestInit = {}) {
     const res = await fetch(url, {
+        cache: "no-store",
         ...options,
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`, ...options.headers },
     });
@@ -16,3 +17,6 @@ async function authFetch(url: string, token: string, options: RequestInit = {}) 
 
 export async function fetchWorkspaces(token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces`, token); }
 export async function fetchWorkspace(workspaceId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}`, token); }
+export async function deleteWorkspace(workspaceId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}`, token, { method: "DELETE" }); }
+export async function addWorkspaceMember(workspaceId: string, username: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members`, token, { method: "POST", body: JSON.stringify({ username }) }); }
+export async function removeWorkspaceMember(workspaceId: string, userId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members/${userId}`, token, { method: "DELETE" }); }

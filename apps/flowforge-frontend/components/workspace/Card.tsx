@@ -1,6 +1,6 @@
 "use client";
 import styles from "./components.module.css";
-import { Star, Clock } from "lucide-react";
+import { Star, Clock, Trash2 } from "lucide-react";
 
 export function ContentCard({ 
     type, 
@@ -11,7 +11,8 @@ export function ContentCard({
     date, 
     isFavorite, 
     onToggleFavorite, 
-    onClick 
+    onClick,
+    onDelete
 }: { 
     type: "note" | "whiteboard", 
     id: string, 
@@ -21,7 +22,8 @@ export function ContentCard({
     date: string, 
     isFavorite: boolean, 
     onToggleFavorite: (e: React.MouseEvent) => void, 
-    onClick: () => void 
+    onClick: () => void,
+    onDelete?: (e: React.MouseEvent) => void
 }) {
     return (
         <div className={styles.noteCard} onClick={onClick}>
@@ -32,9 +34,16 @@ export function ContentCard({
                     </span>
                     <h3 className={styles.noteTitle} style={{ lineHeight: "1.2", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</h3>
                 </div>
-                <span className={`${styles.noteFav} ${isFavorite ? styles.isFav : ""}`} style={{ flexShrink: 0, marginLeft: "12px" }} onClick={(e) => { e.stopPropagation(); onToggleFavorite(e); }}>
-                    <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                    <span className={`${styles.noteFav} ${isFavorite ? styles.isFav : ""}`} onClick={(e) => { e.stopPropagation(); onToggleFavorite(e); }}>
+                        <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
+                    </span>
+                    {onDelete && (
+                        <span className={styles.noteFav} style={{ color: "var(--error)" }} onClick={(e) => { e.stopPropagation(); onDelete(e); }}>
+                            <Trash2 size={18} />
+                        </span>
+                    )}
+                </div>
             </div>
             
             {preview && <div className={styles.notePreview} style={{ marginTop: "12px" }}>{preview}</div>}

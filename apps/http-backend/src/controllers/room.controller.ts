@@ -103,3 +103,47 @@ export async function getNotesForRoom(req: Request, res: Response): Promise<void
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function deleteRoom(req: Request, res: Response): Promise<void> {
+    const userId = req.userId as string;
+    const roomId = parseInt(req.params.roomId as string);
+
+    if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+    if (isNaN(roomId)) {
+        res.status(400).json({ message: "Invalid roomId" });
+        return;
+    }
+
+    try {
+        const room = await prismaClient.room.findUnique({
+            where: { id: roomId },
+            include: { workspace: true }
+        });
+
+        if (!room) {
+            res.status(404).json({ message: "Room not found" });
+            return;
+        }
+
+        // Only the room admin or the workspace owner can delete the room
+        const isRoomAdmin = room.adminId === userId;
+        const isWorkspaceOwner = room.workspace?.ownerId === userId;
+
+        if (!isRoomAdmin && !isWorkspaceOwner) {
+            res.status(403).json({ message: "Forbidden: You do not have permission to delete this room." });
+            return;
+        }
+
+        await prismaClient.room.delete({
+            where: { id: roomId }
+        });
+
+        res.json({ success: true });
+    } catch (e) {
+        console.error("Error deleting room", e);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

@@ -11,12 +11,17 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@blocknote/core": "^0.51.4",
+    "@blocknote/mantine": "^0.51.4",
+    "@blocknote/react": "^0.51.4",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
