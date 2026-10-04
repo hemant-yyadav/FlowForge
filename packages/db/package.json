@@ -7,7 +7,11 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc -b",
+    "generate": "prisma generate",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:status": "prisma migrate status",
+    "build": "pnpm run generate && tsc -b",
     "dev": "tsc -b -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
