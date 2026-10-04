@@ -10,11 +10,11 @@ import styles from "./notes.module.css";
 export default function NotesPage() {
     const { workspaceId } = useParams<{ workspaceId: string }>();
     const router = useRouter();
-    const { token } = useAuth();
-    const { data: notesData, isLoading } = useNotes(workspaceId, token);
-    const { data: favData } = useFavorites(token);
-    const createNote = useCreateNote(workspaceId, token);
-    const toggleFav = useToggleNoteFavorite(token);
+    useAuth();
+    const { data: notesData, isLoading } = useNotes(workspaceId);
+    const { data: favData } = useFavorites();
+    const createNote = useCreateNote(workspaceId);
+    const toggleFav = useToggleNoteFavorite();
 
     const [search, setSearch] = useState("");
     const [title, setTitle] = useState("");

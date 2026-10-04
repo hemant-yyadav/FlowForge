@@ -60,20 +60,20 @@ const schema = BlockNoteSchema.create({
 });
 
 export function NoteEditorEmbed({ noteId, workspaceId }: { noteId: string, workspaceId: string }) {
-    const { token } = useAuth();
-    const { data: noteData, isLoading } = useNote(noteId, token);
+    useAuth();
+    const { data: noteData, isLoading } = useNote(noteId);
     const isViewer = noteData?.role === "VIEWER";
-    const { data: roomsData } = useNoteRooms(noteId, token);
-    const { data: wsRoomsData } = useWorkspaceRooms(workspaceId, token);
+    const { data: roomsData } = useNoteRooms(noteId);
+    const { data: wsRoomsData } = useWorkspaceRooms(workspaceId);
 
-    const attachRoom = useAttachRoom(noteId, token);
-    const detachRoom = useDetachRoom(noteId, token);
+    const attachRoom = useAttachRoom(noteId);
+    const detachRoom = useDetachRoom(noteId);
 
     const [showAttach, setShowAttach] = useState(false);
     const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
     const [localTitle, setLocalTitle] = useState("");
-    const updateNote = useUpdateNote(noteId, token);
+    const updateNote = useUpdateNote(noteId);
 
     // Creates a new editor instance.
     const editor = useCreateBlockNote({ schema });

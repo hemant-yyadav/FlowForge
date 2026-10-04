@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthCard } from "../_components/AuthCard";
-import { apiRequest } from "../../lib/api";
 import styles from "./signin.module.css";
 
 import { signIn } from "next-auth/react";
@@ -18,16 +17,12 @@ export default function SigninPage() {
         e.preventDefault();
         setError("");
         setLoading(true);
-        const { data, error: err } = await apiRequest<{ token: string }>("/signin", {
-            method: "POST",
-            body: form,
-        });
+        const result = await signIn("credentials", { ...form, redirect: false });
         setLoading(false);
-        if (err || !data) {
-            setError(err ?? "Something went wrong");
+        if (!result || result.error) {
+            setError("Invalid credentials or sign-in is unavailable");
             return;
         }
-        localStorage.setItem("token", data.token);
         router.push("/workspaces");
     }
 

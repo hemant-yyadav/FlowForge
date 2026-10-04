@@ -2,15 +2,13 @@
 import { useRouter, useParams } from "next/navigation";
 import styles from "./components.module.css";
 import { Trash2 } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
 import { useDeleteRoom } from "../../hooks/useWorkspaces";
 import toast from "react-hot-toast";
 
 export function WhiteboardCard({ room }: { room: any }) {
     const router = useRouter();
     const params = useParams<{ workspaceId: string }>();
-    const { token } = useAuth();
-    const deleteRoomMutation = useDeleteRoom(params.workspaceId, token);
+    const deleteRoomMutation = useDeleteRoom(params.workspaceId);
 
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();

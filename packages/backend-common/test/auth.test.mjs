@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 process.env.JWT_SECRET = "test-jwt-secret-that-is-long-enough-for-validation";
 process.env.OAUTH_BACKEND_SHARED_SECRET = "test-oauth-secret-that-is-long-enough-for-validation";
+process.env.WS_TICKET_SECRET = "test-ws-ticket-secret-that-is-long-enough-for-validation";
 process.env.ALLOWED_ORIGINS = "http://localhost:3000";
 
 const auth = await import("../dist/auth.js");
@@ -36,6 +37,21 @@ test("forged OAuth assertions cannot establish an identity", () => {
 test("OAuth assertions are short-lived, signed, and provider-restricted", () => {
     const valid = auth.createOAuthAssertion({ provider: "github", providerId: "123", email: null, name: "Test" });
     assert.deepEqual(auth.verifyOAuthAssertion(valid), { provider: "github", providerId: "123", email: null, name: "Test" });
+});
+
+test("WebSocket tickets reject expired, malformed, wrong-audience, and backend access tokens", () => {
+    const ticket = auth.createWebSocketTicket("user-1");
+    assert.equal(auth.verifyWebSocketTicket(ticket)?.userId, "user-1");
+    const expired = jwt.sign({ userId: "user-1", ticketId: "ticket-1" }, process.env.WS_TICKET_SECRET, {
+        expiresIn: -1, audience: "websocket", issuer: "flowforge-nextauth",
+    });
+    const wrongAudience = jwt.sign({ userId: "user-1", ticketId: "ticket-1" }, process.env.WS_TICKET_SECRET, {
+        expiresIn: 60, audience: "not-websocket", issuer: "flowforge-nextauth",
+    });
+    assert.equal(auth.verifyWebSocketTicket(expired), null);
+    assert.equal(auth.verifyWebSocketTicket(wrongAudience), null);
+    assert.equal(auth.verifyWebSocketTicket("malformed"), null);
+    assert.equal(auth.verifyWebSocketTicket(auth.signAccessToken("user-1")), null);
 });
 
 test("origin configuration rejects absent and malformed origins", () => {

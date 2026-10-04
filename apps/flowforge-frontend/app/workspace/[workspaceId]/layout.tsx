@@ -2,13 +2,11 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useWorkspace } from "../../../hooks/useWorkspaces";
-import { useAuth } from "../../../hooks/useAuth";
 import { Sidebar } from "../../../components/workspace/Sidebar";
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
     const { workspaceId } = useParams<{workspaceId: string}>();
-    const { token } = useAuth();
-    const { data } = useWorkspace(workspaceId, token);
+    const { data } = useWorkspace(workspaceId);
     const workspace = data?.workspace;
 
     const [collapsed, setCollapsed] = useState(false);

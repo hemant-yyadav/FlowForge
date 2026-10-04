@@ -1,41 +1,21 @@
 "use client";
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import { useWorkspaces } from "../../hooks/useWorkspaces";
-import { HTTP_URL } from "../../config";
 import { User, Users } from "lucide-react";
 import { ProfileDropdown } from "../../components/workspace/ProfileDropdown";
 
-function decodeJWT(token: string | null) {
-    if (!token) return null;
-    try {
-        return JSON.parse(atob(token.split('.')[1] || ""));
-    } catch {
-        return null;
-    }
-}
-
 function WorkspacesContent() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const { token, loading, user: currentUser } = useAuth();
-
-    useEffect(() => {
-        const urlToken = searchParams.get("token");
-        if (urlToken) {
-            localStorage.setItem("token", urlToken);
-            window.history.replaceState({}, document.title, "/workspaces");
-            window.location.reload(); // Reload to let useAuth pick it up
-        }
-    }, [searchParams]);
+    const { loading, user: currentUser, signout } = useAuth();
 
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState("");
     const [newDesc, setNewDesc] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { data, isLoading } = useWorkspaces(token);
+    const { data, isLoading } = useWorkspaces(!loading);
 
     if (loading || isLoading) return <div style={{padding: "48px", color: "var(--text-muted)", textAlign: "center"}}>Loading workspaces...</div>;
 
@@ -46,9 +26,9 @@ function WorkspacesContent() {
         if (!newName.trim() || isSubmitting) return;
         setIsSubmitting(true);
         try {
-            const res = await fetch(`${HTTP_URL}/api/v1/workspaces`, {
+            const res = await fetch("/api/backend/api/v1/workspaces", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: newName.trim(), description: newDesc.trim() })
             });
             if (res.ok) {
@@ -78,8 +58,7 @@ function WorkspacesContent() {
                         <ProfileDropdown 
                             user={currentUser} 
                             onLogout={() => {
-                                localStorage.removeItem("token");
-                                window.location.href = "/signin";
+                                signout();
                             }} 
                         />
                     )}

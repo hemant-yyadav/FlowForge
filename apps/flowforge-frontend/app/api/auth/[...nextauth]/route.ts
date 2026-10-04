@@ -1,61 +1,58 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { createOAuthAssertion } from "@repo/backend-common/auth";
 import { getHttpBackendUrl } from "@repo/backend-common/config";
+import { getNextAuthSecret } from "../../../../lib/server-auth";
 
 const handler = NextAuth({
+    secret: getNextAuthSecret(),
+    session: { strategy: "jwt", maxAge: 15 * 60 },
     providers: [
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID || "",
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+        CredentialsProvider({
+            name: "Credentials",
+            credentials: { username: { label: "Username", type: "text" }, password: { label: "Password", type: "password" } },
+            async authorize(credentials) {
+                if (typeof credentials?.username !== "string" || typeof credentials.password !== "string") return null;
+                try {
+                    const response = await fetch(`${getHttpBackendUrl()}/signin`, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username: credentials.username, password: credentials.password }),
+                    });
+                    if (!response.ok) return null;
+                    const data = await response.json() as { token?: unknown; userId?: unknown };
+                    if (typeof data.token !== "string" || !data.token || typeof data.userId !== "string" || !data.userId) return null;
+                    return { id: data.userId, name: credentials.username, backendAccessToken: data.token, backendUserId: data.userId };
+                } catch { return null; }
+            },
         }),
-        GithubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID || "",
-            clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-        }),
+        GoogleProvider({ clientId: process.env.GOOGLE_CLIENT_ID || "", clientSecret: process.env.GOOGLE_CLIENT_SECRET || "" }),
+        GithubProvider({ clientId: process.env.GITHUB_CLIENT_ID || "", clientSecret: process.env.GITHUB_CLIENT_SECRET || "" }),
     ],
-    secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async jwt({ token, account, user }) {
-            // Initial sign in
-            if (account && user) {
-                try {
-                    if (account.provider !== "google" && account.provider !== "github") {
-                        throw new Error("Unsupported OAuth provider");
-                    }
-                    // Exchange OAuth profile for our custom backend JWT
-                    const assertion = createOAuthAssertion({
-                        email: user.email ?? null,
-                        name: user.name ?? null,
-                        provider: account.provider,
-                        providerId: account.providerAccountId,
-                    });
-                    const backendUrl = getHttpBackendUrl();
-                    const res = await fetch(`${backendUrl}/oauth`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ assertion }),
-                    });
-
-                    if (res.ok) {
-                        const data = await res.json();
-                        token.customJwt = data.token;
-                    } else {
-                        const errText = await res.text();
-                        console.error("Failed to authenticate with custom backend:", res.status, errText);
-                    }
-                } catch (error) {
-                    console.error("Error during OAuth exchange:", error);
-                }
+            if (user && "backendAccessToken" in user && typeof user.backendAccessToken === "string") token.backendAccessToken = user.backendAccessToken;
+            if (user && "backendUserId" in user && typeof user.backendUserId === "string") token.backendUserId = user.backendUserId;
+            if (account && user && account.provider !== "credentials") {
+                if (account.provider !== "google" && account.provider !== "github") throw new Error("Unsupported OAuth provider");
+                const assertion = createOAuthAssertion({ email: user.email ?? null, name: user.name ?? null, provider: account.provider, providerId: account.providerAccountId });
+                const response = await fetch(`${getHttpBackendUrl()}/oauth`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ assertion }),
+                });
+                if (!response.ok) throw new Error("OAuth sign-in could not be completed");
+                const data = await response.json() as { token?: unknown; userId?: unknown };
+                if (typeof data.token !== "string" || !data.token || typeof data.userId !== "string" || !data.userId) throw new Error("OAuth sign-in could not be completed");
+                // Stored only in NextAuth's encrypted server-side JWT cookie.
+                token.backendAccessToken = data.token;
+                token.backendUserId = data.userId;
             }
             return token;
         },
         async session({ session, token }) {
-            // Send the custom JWT to the client
-            const customSession = session as typeof session & { customJwt?: string | unknown };
-            customSession.customJwt = token.customJwt;
-            return customSession;
+            // Do not expose backendAccessToken or another backend credential here.
+            if (session.user && typeof token.backendUserId === "string") session.user.id = token.backendUserId;
+            return session;
         },
     },
 });

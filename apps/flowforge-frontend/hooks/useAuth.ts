@@ -1,44 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { HTTP_URL } from "../config";
+import { useEffect } from "react";
 
 export function useAuth() {
     const router = useRouter();
-    const [token, setToken] = useState<string | null>(null);
-    const [user, setUser] = useState<{ id: string; name: string; username?: string; email?: string } | null>(null);
-    const [loading, setLoading] = useState(true);
-
+    const { data: session, status } = useSession();
+    const loading = status === "loading";
+    const user = session?.user ? { id: session.user.id ?? "", name: session.user.name ?? "", email: session.user.email ?? undefined } : null;
     useEffect(() => {
-        const t = localStorage.getItem("token");
-        if (!t) {
-            router.push("/signin");
-            setLoading(false);
-        } else {
-            setToken(t);
-            // Fetch user profile from backend to get name and username
-            fetch(`${HTTP_URL}/me`, {
-                headers: { "Authorization": `Bearer ${t}` }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.user) {
-                    setUser(data.user);
-                } else {
-                    // Fallback if not successful
-                    setUser(JSON.parse(atob(t.split('.')[1] || "")));
-                }
-            })
-            .catch(() => setUser(JSON.parse(atob(t.split('.')[1] || ""))))
-            .finally(() => setLoading(false));
-        }
-    }, [router]);
-
-    function signout() {
-        localStorage.removeItem("token");
-        window.location.href = "/logout";
-    }
-
-    return { token, loading, signout, user };
+        if (!loading && !session) router.replace("/signin");
+    }, [loading, router, session]);
+    return { loading, signout: () => signOut({ callbackUrl: "/signin" }), user, authenticated: status === "authenticated" };
 }

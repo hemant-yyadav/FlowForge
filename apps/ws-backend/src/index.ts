@@ -1,7 +1,7 @@
 import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import { WebSocketInboundMessageSchema } from "@repo/common/src/types";
-import { checkUser } from "@repo/backend-common/auth";
+import { verifyWebSocketTicket } from "@repo/backend-common/auth";
 import { assertWebSocketConfiguration, isAllowedOrigin } from "@repo/backend-common/config";
 import { prismaClient } from "db";
 import { addUser, findUser, getActiveRooms, getUsersInRoom, removeUser } from "./UserManager.js";
@@ -85,21 +85,21 @@ wss.on("connection", (ws) => {
                 sendError(ws, "Already authenticated");
                 return;
             }
-            const userId = checkUser(message.token);
-            if (!userId) {
+            const ticket = verifyWebSocketTicket(message.token);
+            if (!ticket) {
                 sendError(ws, "Unauthorized");
                 ws.close(1008, "Unauthorized");
                 return;
             }
             try {
-                const dbUser = await prismaClient.user.findUnique({ where: { id: userId } });
+                const dbUser = await prismaClient.user.findUnique({ where: { id: ticket.userId } });
                 if (!dbUser) {
                     sendError(ws, "Unauthorized");
                     ws.close(1008, "Unauthorized");
                     return;
                 }
-                authenticatedUserId = userId;
-                addUser({ ws, rooms: [], userId, name: dbUser.name, roles: {} });
+                authenticatedUserId = ticket.userId;
+                addUser({ ws, rooms: [], userId: ticket.userId, name: dbUser.name, roles: {} });
                 ws.send(JSON.stringify({ type: "authenticated" }));
             } catch {
                 sendError(ws, "Authentication unavailable");

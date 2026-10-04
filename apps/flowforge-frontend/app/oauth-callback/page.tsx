@@ -3,30 +3,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { signOut } from "next-auth/react";
 
 export default function OAuthCallbackPage() {
     const router = useRouter();
 
     useEffect(() => {
-        // Fetch the NextAuth session to grab the custom JWT
-        fetch("/api/auth/session")
-            .then(res => res.json())
-            .then(session => {
-                if (session?.customJwt) {
-                    // Store the custom JWT in localStorage for FlowForge
-                    localStorage.setItem("token", session.customJwt);
-                    router.push("/workspaces");
-                } else {
-                    console.error("No custom JWT found in session");
-                    // Clear the broken NextAuth session so the user can try again
-                    signOut({ callbackUrl: "/signin" });
-                }
-            })
-            .catch(err => {
-                console.error("Failed to fetch session:", err);
-                signOut({ callbackUrl: "/signin" });
-            });
+        // OAuth completed server-side; the browser receives only the NextAuth cookie.
+        router.replace("/workspaces");
     }, [router]);
 
     return (

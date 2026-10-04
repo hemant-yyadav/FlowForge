@@ -24,13 +24,13 @@ export default function WorkspaceDashboard() {
     const { workspaceId } = useParams<{workspaceId: string}>();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { token, user } = useAuth();
+    const { user, signout } = useAuth();
     
-    const { data: wsData, isLoading: wsLoading } = useWorkspace(workspaceId, token);
-    const { data: notesData, isLoading: notesLoading } = useNotes(workspaceId, token);
-    const { data: roomsData, isLoading: roomsLoading } = useWorkspaceRooms(workspaceId, token);
+    const { data: wsData, isLoading: wsLoading } = useWorkspace(workspaceId);
+    const { data: notesData, isLoading: notesLoading } = useNotes(workspaceId);
+    const { data: roomsData, isLoading: roomsLoading } = useWorkspaceRooms(workspaceId);
     const { data: activeRooms = [] } = useActiveRooms();
-    const { data: favData } = useFavorites(token);
+    const { data: favData } = useFavorites();
 
     let currentUserRole = "VIEWER";
     if (wsData?.workspace && user) {
@@ -43,11 +43,11 @@ export default function WorkspaceDashboard() {
         }
     }
 
-    const toggleNoteFav = useToggleNoteFavorite(token);
-    const toggleRoomFav = useToggleRoomFavorite(token);
+    const toggleNoteFav = useToggleNoteFavorite();
+    const toggleRoomFav = useToggleRoomFavorite();
 
-    const deleteNote = useDeleteNote(workspaceId, token);
-    const deleteRoom = useDeleteWorkspaceRoom(workspaceId, token);
+    const deleteNote = useDeleteNote(workspaceId);
+    const deleteRoom = useDeleteWorkspaceRoom(workspaceId);
 
     const { tabs, activeTabId, setActiveTabId, openTab, closeTab } = useTabManager();
 
@@ -165,15 +165,13 @@ export default function WorkspaceDashboard() {
                 onTabClose={closeTab} 
                 user={user}
                 onLogout={() => {
-                    localStorage.removeItem("token");
-                    window.location.href = "/signin";
+                    signout();
                 }}
             />
             
             <div style={{ flex: 1, overflowY: "auto", padding: "0 32px 32px 32px" }}>
                 <CreateContentModal 
                     workspaceId={workspaceId} 
-                    token={token!} 
                     open={showCreate.open} 
                     defaultType={showCreate.defaultType}
                     onClose={() => setShowCreate({ open: false, defaultType: "note" })} 

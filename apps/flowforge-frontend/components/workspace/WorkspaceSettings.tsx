@@ -8,13 +8,13 @@ import { ConfirmationModal } from "./ConfirmationModal";
 import { useRouter } from "next/navigation";
 
 export function WorkspaceSettings({ workspaceId }: { workspaceId: string }) {
-    const { token } = useAuth();
+    const { user } = useAuth();
     const router = useRouter();
-    const { data, isLoading } = useWorkspace(workspaceId, token);
-    const addMember = useAddWorkspaceMember(workspaceId, token);
-    const removeMember = useRemoveWorkspaceMember(workspaceId, token);
-    const updateRole = useUpdateWorkspaceMemberRole(workspaceId, token);
-    const deleteWorkspace = useDeleteWorkspace(token);
+    const { data, isLoading } = useWorkspace(workspaceId);
+    const addMember = useAddWorkspaceMember(workspaceId);
+    const removeMember = useRemoveWorkspaceMember(workspaceId);
+    const updateRole = useUpdateWorkspaceMemberRole(workspaceId);
+    const deleteWorkspace = useDeleteWorkspace();
 
     const [inviteUsername, setInviteUsername] = useState("");
     const [inviteError, setInviteError] = useState("");
@@ -25,7 +25,7 @@ export function WorkspaceSettings({ workspaceId }: { workspaceId: string }) {
     const workspace = data?.workspace;
     if (!workspace) return <div style={{ padding: "32px", textAlign: "center", color: "var(--error)" }}>Workspace not found</div>;
 
-    const isOwner = workspace.ownerId === (token ? JSON.parse(atob(token.split('.')[1] as string)).userId : "");
+    const isOwner = workspace.ownerId === user?.id;
 
     const handleInvite = async (e: React.FormEvent) => {
         e.preventDefault();

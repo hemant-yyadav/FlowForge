@@ -11,7 +11,7 @@ function configuredUrl(name: string, fallback: string, protocols: string[]): str
     }
 }
 
-function requiredSecret(name: "JWT_SECRET" | "OAUTH_BACKEND_SHARED_SECRET"): string {
+function requiredSecret(name: "JWT_SECRET" | "OAUTH_BACKEND_SHARED_SECRET" | "WS_TICKET_SECRET"): string {
     const value = process.env[name];
     if (!value || value.length < MIN_SECRET_LENGTH) {
         throw new Error(`${name} must be set to a secret of at least ${MIN_SECRET_LENGTH} characters`);
@@ -26,6 +26,7 @@ function requiredSecret(name: "JWT_SECRET" | "OAUTH_BACKEND_SHARED_SECRET"): str
  */
 export const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
 export const OAUTH_ASSERTION_TTL_SECONDS = 60;
+export const WS_TICKET_TTL_SECONDS = 60;
 
 export function getJwtSecret(): string {
     return requiredSecret("JWT_SECRET");
@@ -33,6 +34,11 @@ export function getJwtSecret(): string {
 
 export function getOAuthBackendSharedSecret(): string {
     return requiredSecret("OAUTH_BACKEND_SHARED_SECRET");
+}
+
+/** Dedicated to browser-to-WebSocket authentication; never reuse JWT_SECRET. */
+export function getWebSocketTicketSecret(): string {
+    return requiredSecret("WS_TICKET_SECRET");
 }
 
 export function getAllowedOrigins(): string[] {
@@ -69,6 +75,6 @@ export function assertHttpConfiguration(): void {
 }
 
 export function assertWebSocketConfiguration(): void {
-    getJwtSecret();
+    getWebSocketTicketSecret();
     getAllowedOrigins();
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { WS_URL } from "../config";
 
-export function useWhiteboardSocket(roomId: string, token: string | null) {
+export function useWhiteboardSocket(roomId: string) {
     const wsRef = useRef<WebSocket | null>(null);
     const [connected, setConnected] = useState(false);
     const [chats, setChats] = useState<{ message: string, userId: string, id: string }[]>([]);
@@ -11,23 +11,25 @@ export function useWhiteboardSocket(roomId: string, token: string | null) {
     const [roomUsers, setRoomUsers] = useState<{ id: string, name: string }[]>([]);
 
     useEffect(() => {
-        if (!token || !roomId) return;
+        if (!roomId) return;
+        let cancelled = false;
+        let ws: WebSocket | null = null;
+        void fetch("/api/ws-ticket", { method: "POST" })
+            .then(async (response) => response.ok ? response.json() as Promise<{ ticket?: unknown }> : Promise.reject())
+            .then(({ ticket }) => {
+                if (cancelled || typeof ticket !== "string") return;
+                ws = new WebSocket(WS_URL);
+                wsRef.current = ws;
+                ws.onopen = () => { setConnected(true); ws?.send(JSON.stringify({ type: "authenticate", token: ticket })); };
+                ws.onmessage = onMessage;
+                ws.onclose = () => setConnected(false);
+            });
 
-        const ws = new WebSocket(WS_URL);
-
-        ws.onopen = () => {
-            setConnected(true);
-            // Keep the bearer token out of URLs, which are routinely logged by
-            // browsers, proxies, and servers. The server requires this frame
-            // before it accepts any room action.
-            ws.send(JSON.stringify({ type: "authenticate", token }));
-        };
-
-        ws.onmessage = (event) => {
+        const onMessage = (event: MessageEvent) => {
             const data = JSON.parse(event.data);
 
             if (data.type === "authenticated") {
-                ws.send(JSON.stringify({ type: "join_room", roomId }));
+                ws?.send(JSON.stringify({ type: "join_room", roomId }));
                 return;
             }
             
@@ -56,17 +58,12 @@ export function useWhiteboardSocket(roomId: string, token: string | null) {
             }
         };
 
-        ws.onclose = () => {
-            setConnected(false);
-        };
-
-        wsRef.current = ws;
-
         return () => {
-            ws.send(JSON.stringify({ type: "leave_room", roomId }));
-            ws.close();
+            cancelled = true;
+            if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "leave_room", roomId }));
+            ws?.close();
         };
-    }, [roomId, token]);
+    }, [roomId]);
 
     const sendChat = (message: string) => {
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {

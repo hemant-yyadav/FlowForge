@@ -1,9 +1,7 @@
-import { HTTP_URL } from "../config";
-
-async function authFetch(url: string, token: string, options: RequestInit = {}) {
-    const res = await fetch(url, {
+async function authFetch(path: string, options: RequestInit = {}) {
+    const res = await fetch(`/api/backend${path}`, {
         ...options,
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`, ...options.headers },
+        headers: { "Content-Type": "application/json", ...options.headers },
     });
     if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -14,6 +12,6 @@ async function authFetch(url: string, token: string, options: RequestInit = {}) 
     return res.json();
 }
 
-export async function fetchFavorites(token: string) { return authFetch(`${HTTP_URL}/api/v1/favorites`, token); }
-export async function toggleNoteFavorite(noteId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/favorites/notes/${noteId}`, token, { method: "POST" }); }
-export async function toggleRoomFavorite(roomId: number, token: string) { return authFetch(`${HTTP_URL}/api/v1/favorites/rooms/${roomId}`, token, { method: "POST" }); }
+export async function fetchFavorites() { return authFetch(`/api/v1/favorites`); }
+export async function toggleNoteFavorite(noteId: string) { return authFetch(`/api/v1/favorites/notes/${noteId}`, { method: "POST" }); }
+export async function toggleRoomFavorite(roomId: number) { return authFetch(`/api/v1/favorites/rooms/${roomId}`, { method: "POST" }); }

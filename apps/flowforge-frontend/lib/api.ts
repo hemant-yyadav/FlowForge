@@ -1,11 +1,8 @@
-import { API_URL } from "./constants";
-
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface ApiOptions {
     method?: HttpMethod;
     body?: unknown;
-    token?: string;
 }
 
 interface ApiResult<T> {
@@ -17,18 +14,14 @@ export async function apiRequest<T>(
     path: string,
     options: ApiOptions = {}
 ): Promise<ApiResult<T>> {
-    const { method = "GET", body, token } = options;
+    const { method = "GET", body } = options;
 
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
     };
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-
     try {
-        const res = await fetch(`${API_URL}${path}`, {
+        const res = await fetch(`/api/backend${path}`, {
             method,
             headers,
             body: body ? JSON.stringify(body) : undefined,

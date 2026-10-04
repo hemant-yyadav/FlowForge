@@ -2,49 +2,49 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as api from "../lib/workspace-api";
 
-export function useWorkspaces(token: string | null) {
-    return useQuery({ queryKey: ["workspaces", token], queryFn: () => api.fetchWorkspaces(token!), enabled: !!token });
+export function useWorkspaces(enabled = true) {
+    return useQuery({ queryKey: ["workspaces"], queryFn: api.fetchWorkspaces, enabled });
 }
-export function useWorkspace(workspaceId: string | null, token: string | null) {
-    return useQuery({ queryKey: ["workspace", workspaceId, token], queryFn: () => api.fetchWorkspace(workspaceId!, token!), enabled: !!workspaceId && !!token });
+export function useWorkspace(workspaceId: string | null, enabled = true) {
+    return useQuery({ queryKey: ["workspace", workspaceId], queryFn: () => api.fetchWorkspace(workspaceId!), enabled: !!workspaceId && enabled });
 }
 
-export function useDeleteWorkspace(token: string | null) {
+export function useDeleteWorkspace() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (workspaceId: string) => api.deleteWorkspace(workspaceId, token!),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspaces", token] })
+        mutationFn: api.deleteWorkspace,
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspaces"] })
     });
 }
 
-export function useAddWorkspaceMember(workspaceId: string, token: string | null) {
+export function useAddWorkspaceMember(workspaceId: string) {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (username: string) => api.addWorkspaceMember(workspaceId, username, token!),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId, token] })
+        mutationFn: (username: string) => api.addWorkspaceMember(workspaceId, username),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId] })
     });
 }
 
-export function useRemoveWorkspaceMember(workspaceId: string, token: string | null) {
+export function useRemoveWorkspaceMember(workspaceId: string) {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (userId: string) => api.removeWorkspaceMember(workspaceId, userId, token!),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId, token] })
+        mutationFn: (userId: string) => api.removeWorkspaceMember(workspaceId, userId),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId] })
     });
 }
 
-export function useUpdateWorkspaceMemberRole(workspaceId: string, token: string | null) {
+export function useUpdateWorkspaceMemberRole(workspaceId: string) {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({ userId, role }: { userId: string, role: string }) => api.updateWorkspaceMemberRole(workspaceId, userId, role, token!),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId, token] })
+        mutationFn: ({ userId, role }: { userId: string, role: string }) => api.updateWorkspaceMemberRole(workspaceId, userId, role),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId] })
     });
 }
 
-export function useDeleteRoom(workspaceId: string, token: string | null) {
+export function useDeleteRoom(workspaceId: string) {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (roomId: number) => api.deleteRoom(roomId, token!),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId, token] })
+        mutationFn: api.deleteRoom,
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId] })
     });
 }

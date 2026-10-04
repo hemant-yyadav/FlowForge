@@ -1,10 +1,8 @@
-import { HTTP_URL } from "../config";
-
-async function authFetch(url: string, token: string, options: RequestInit = {}) {
-    const res = await fetch(url, {
+async function authFetch(path: string, options: RequestInit = {}) {
+    const res = await fetch(`/api/backend${path}`, {
         cache: "no-store",
         ...options,
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`, ...options.headers },
+        headers: { "Content-Type": "application/json", ...options.headers },
     });
     if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -15,10 +13,10 @@ async function authFetch(url: string, token: string, options: RequestInit = {}) 
     return res.json();
 }
 
-export async function fetchWorkspaces(token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces`, token); }
-export async function fetchWorkspace(workspaceId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}`, token); }
-export async function deleteWorkspace(workspaceId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}`, token, { method: "DELETE" }); }
-export async function addWorkspaceMember(workspaceId: string, username: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members`, token, { method: "POST", body: JSON.stringify({ username }) }); }
-export async function removeWorkspaceMember(workspaceId: string, userId: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members/${userId}`, token, { method: "DELETE" }); }
-export async function updateWorkspaceMemberRole(workspaceId: string, userId: string, role: string, token: string) { return authFetch(`${HTTP_URL}/api/v1/workspaces/${workspaceId}/members/${userId}/role`, token, { method: "PUT", body: JSON.stringify({ role }) }); }
-export async function deleteRoom(roomId: number, token: string) { return authFetch(`${HTTP_URL}/room/${roomId}`, token, { method: "DELETE" }); }
+export async function fetchWorkspaces() { return authFetch(`/api/v1/workspaces`); }
+export async function fetchWorkspace(workspaceId: string) { return authFetch(`/api/v1/workspaces/${workspaceId}`); }
+export async function deleteWorkspace(workspaceId: string) { return authFetch(`/api/v1/workspaces/${workspaceId}`, { method: "DELETE" }); }
+export async function addWorkspaceMember(workspaceId: string, username: string) { return authFetch(`/api/v1/workspaces/${workspaceId}/members`, { method: "POST", body: JSON.stringify({ username }) }); }
+export async function removeWorkspaceMember(workspaceId: string, userId: string) { return authFetch(`/api/v1/workspaces/${workspaceId}/members/${userId}`, { method: "DELETE" }); }
+export async function updateWorkspaceMemberRole(workspaceId: string, userId: string, role: string) { return authFetch(`/api/v1/workspaces/${workspaceId}/members/${userId}/role`, { method: "PUT", body: JSON.stringify({ role }) }); }
+export async function deleteRoom(roomId: number) { return authFetch(`/room/${roomId}`, { method: "DELETE" }); }

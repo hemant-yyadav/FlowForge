@@ -4,10 +4,6 @@ import { signOut } from "next-auth/react";
 
 export default function LogoutPage() {
     useEffect(() => {
-        // Clear tokens from the web app's localStorage
-        localStorage.removeItem("token");
-        
-        // Also sign out of NextAuth and redirect to signin
         signOut({ callbackUrl: "/signin" });
     }, []);
 

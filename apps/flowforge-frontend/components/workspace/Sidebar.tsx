@@ -20,13 +20,13 @@ export function Sidebar({
     const router = useRouter();
     const pathname = usePathname();
     const { theme, toggleTheme } = useTheme();
-    const { token, signout } = useAuth();
+    const { signout } = useAuth();
 
     const searchParams = useSearchParams();
 
     // Fetch notes/rooms for the "Recent" section
-    const { data: notesData } = useNotes(workspaceId, token);
-    const { data: roomsData } = useWorkspaceRooms(workspaceId, token);
+    const { data: notesData } = useNotes(workspaceId);
+    const { data: roomsData } = useWorkspaceRooms(workspaceId);
 
     const [recentItems, setRecentItems] = useState<Array<{id: string, title: string, type: string, date: string}>>([]);
 

@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import styles from "./components.module.css";
 import { useCreateNote, useCreateWorkspaceRoom } from "../../hooks/useNotes";
 
-export function CreateContentModal({ workspaceId, token, open, defaultType = "note", onClose, onNoteCreated }: { workspaceId: string, token: string, open: boolean, defaultType?: "note"|"whiteboard", onClose: () => void, onNoteCreated: (noteId: string, title: string, type?: "note"|"whiteboard") => void }) {
+export function CreateContentModal({ workspaceId, open, defaultType = "note", onClose, onNoteCreated }: { workspaceId: string, open: boolean, defaultType?: "note"|"whiteboard", onClose: () => void, onNoteCreated: (noteId: string, title: string, type?: "note"|"whiteboard") => void }) {
     const [title, setTitle] = useState("");
     const type = defaultType;
     
-    const createNote = useCreateNote(workspaceId, token);
-    const createRoom = useCreateWorkspaceRoom(workspaceId, token);
+    const createNote = useCreateNote(workspaceId);
+    const createRoom = useCreateWorkspaceRoom(workspaceId);
     const [error, setError] = useState<string | null>(null);
 
     // Reset title when opening

@@ -48,7 +48,7 @@ export async function signin(req: Request, res: Response) {
         return;
     }
     const token = signAccessToken(user.id);
-    res.json({ token });
+    res.json({ token, userId: user.id });
 }
 
 export async function oauthSignin(req: Request, res: Response) {

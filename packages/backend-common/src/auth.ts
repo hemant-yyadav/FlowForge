@@ -4,6 +4,8 @@ import {
     getJwtSecret,
     getOAuthBackendSharedSecret,
     OAUTH_ASSERTION_TTL_SECONDS,
+    getWebSocketTicketSecret,
+    WS_TICKET_TTL_SECONDS,
 } from "./config.js";
 
 export type OAuthProvider = "google" | "github";
@@ -13,6 +15,11 @@ export interface OAuthAssertion {
     name: string | null;
     provider: OAuthProvider;
     providerId: string;
+}
+
+export interface WebSocketTicket {
+    userId: string;
+    ticketId: string;
 }
 
 export function signAccessToken(userId: string): string {
@@ -57,6 +64,33 @@ export function verifyOAuthAssertion(token: string): OAuthAssertion | null {
             email: typeof email === "string" ? email : null,
             name: typeof name === "string" ? name : null,
         };
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Tickets are intentionally short lived and audience-bound. They are stateless:
+ * enforcing strict single use would require a shared ticket store (for example Redis).
+ */
+export function createWebSocketTicket(userId: string): string {
+    return jwt.sign({ userId, ticketId: crypto.randomUUID() }, getWebSocketTicketSecret(), {
+        expiresIn: WS_TICKET_TTL_SECONDS,
+        audience: "websocket",
+        issuer: "flowforge-nextauth",
+    });
+}
+
+export function verifyWebSocketTicket(token: string): WebSocketTicket | null {
+    try {
+        const decoded = jwt.verify(token, getWebSocketTicketSecret(), {
+            audience: "websocket",
+            issuer: "flowforge-nextauth",
+        });
+        if (!decoded || typeof decoded === "string") return null;
+        const { userId, ticketId } = decoded as JwtPayload;
+        if (typeof userId !== "string" || userId.length === 0 || typeof ticketId !== "string" || ticketId.length === 0) return null;
+        return { userId, ticketId };
     } catch {
         return null;
     }

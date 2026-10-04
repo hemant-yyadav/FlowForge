@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { HTTP_URL } from "../../../config";
 import { useWhiteboardSocket } from "../../../hooks/useWhiteboardSocket";
 import { useCanvas } from "../../../hooks/useCanvas";
 import { Toolbar } from "../../../components/Toolbar";
@@ -26,32 +25,13 @@ function RoomCanvasInner() {
         console.log("RoomCanvas mount - embedded param:", embeddedParam, "isEmbedded:", isEmbedded);
     }, [embeddedParam, isEmbedded]);
 
-    const [token, setToken] = useState<string | null>(null);
     const [initialShapes, setInitialShapes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [role, setRole] = useState<string>("VIEWER");
 
     useEffect(() => {
-        let storedToken = localStorage.getItem("token");
-        const urlToken = searchParams.get("token");
-
-        if (urlToken) {
-            localStorage.setItem("token", urlToken);
-            storedToken = urlToken;
-            window.history.replaceState({}, document.title, `/room/${slug}`);
-        }
-
-        if (!storedToken) {
-            router.push("/signin");
-            return;
-        }
-        setToken(storedToken);
-
-        // Fetch initial shapes from HTTP backend
-        fetch(`${HTTP_URL}/room/${slug}/shapes`, {
-            headers: { "Authorization": `Bearer ${storedToken}` }
-        })
+        fetch(`/api/backend/room/${encodeURIComponent(slug)}/shapes`)
         .then(async (res) => {
             if (res.status === 404) {
                 setError("Room not found");
@@ -84,7 +64,7 @@ function RoomCanvasInner() {
         });
     }, [slug, searchParams, router]);
 
-    const { connected, chats, remoteShapes, remoteCursors, sendChat, sendDraw, sendCursor, sendClearBoard, clearTrigger, roomUsers } = useWhiteboardSocket(slug, token);
+    const { connected, chats, remoteShapes, remoteCursors, sendChat, sendDraw, sendCursor, sendClearBoard, clearTrigger, roomUsers } = useWhiteboardSocket(slug);
     
     useEffect(() => {
         if (clearTrigger > 0) {
