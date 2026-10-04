@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
+import { createOAuthAssertion } from "@repo/backend-common/auth";
 
 const handler = NextAuth({
     providers: [
@@ -20,15 +21,20 @@ const handler = NextAuth({
             if (account && user) {
                 try {
                     // Exchange OAuth profile for our custom backend JWT
-                    const res = await fetch("http://localhost:3001/oauth", {
+                    if (account.provider !== "google" && account.provider !== "github") {
+                        throw new Error("Unsupported OAuth provider");
+                    }
+                    const assertion = createOAuthAssertion({
+                        email: user.email ?? null,
+                        name: user.name ?? null,
+                        provider: account.provider,
+                        providerId: account.providerAccountId,
+                    });
+                    const backendUrl = process.env.HTTP_BACKEND_URL || "http://localhost:3001";
+                    const res = await fetch(`${backendUrl}/oauth`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            email: user.email,
-                            name: user.name,
-                            provider: account.provider,
-                            providerId: account.providerAccountId,
-                        }),
+                        body: JSON.stringify({ assertion }),
                     });
 
                     if (res.ok) {

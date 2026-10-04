@@ -10,8 +10,7 @@ export async function handleDraw(ws: WebSocket, roomSlug: string, shape: any, us
     if (!room) return;
 
     const user = findUser(ws);
-    if (!user || user.roles[roomSlug] === "VIEWER") {
-        console.log(`User ${userId} rejected from drawing (role: VIEWER)`);
+    if (!user || !user.rooms.includes(roomSlug) || user.roles[roomSlug] === "VIEWER") {
         return;
     }
 

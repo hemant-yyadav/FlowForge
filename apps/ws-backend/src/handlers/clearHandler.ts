@@ -10,8 +10,7 @@ export async function handleClearBoard(ws: WebSocket, roomSlug: string, userId: 
     if (!room) return;
 
     const user = findUser(ws);
-    if (!user || user.roles[roomSlug] === "VIEWER") {
-        console.log(`User ${userId} rejected from clearing (role: VIEWER)`);
+    if (!user || !user.rooms.includes(roomSlug) || user.roles[roomSlug] === "VIEWER") {
         return;
     }
 

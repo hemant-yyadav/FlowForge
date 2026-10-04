@@ -48,6 +48,12 @@ export async function getRoom(req: Request, res: Response): Promise<void> {
             return;
         }
 
+        const userId = req.userId;
+        if (!userId || !(await canAccessRoom(userId, room.id))) {
+            res.status(403).json({ message: "Forbidden" });
+            return;
+        }
+
         res.json({ room });
     } catch (e) {
         res.status(500).json({ message: "Internal server error" });
@@ -68,12 +74,14 @@ export async function getShapes(req: Request, res: Response): Promise<void> {
         }
 
         const userId = req.userId;
-        let role = null;
-        if (userId && room.workspaceId) {
-            role = await getUserRoleInWorkspace(userId, room.workspaceId);
-        } else if (userId && room.adminId === userId) {
-            role = "OWNER";
+        if (!userId || !(await canAccessRoom(userId, room.id))) {
+            res.status(403).json({ message: "Forbidden" });
+            return;
         }
+        // Legacy rooms are intentionally available to every authenticated user.
+        const role = room.workspaceId
+            ? await getUserRoleInWorkspace(userId, room.workspaceId)
+            : room.adminId === userId ? "OWNER" : "VIEWER";
 
         res.json({ shapes: room.shapes, role });
     } catch (e) {

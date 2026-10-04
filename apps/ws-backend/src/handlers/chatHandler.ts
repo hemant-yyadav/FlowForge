@@ -8,6 +8,8 @@ export async function handleChat(ws: WebSocket, roomSlug: string, message: strin
     });
 
     if (!room) return;
+    const sender = findUser(ws);
+    if (!sender || !sender.rooms.includes(roomSlug)) return;
 
     try {
         await prismaClient.chat.create({
@@ -17,14 +19,11 @@ export async function handleChat(ws: WebSocket, roomSlug: string, message: strin
         console.error("Failed to save chat to DB:", e);
     }
 
-    const sender = findUser(ws);
     const senderName = sender?.name || "Unknown";
 
     const payload = JSON.stringify({ type: "chat", message, roomId: roomSlug, senderName });
     
     const usersInRoom = getUsersInRoom(roomSlug);
-    console.log(`Broadcasting to ${usersInRoom.length} users in room ${roomSlug}`);
-
     usersInRoom.forEach((user) => {
         if (user.ws !== ws) {
             user.ws.send(payload);

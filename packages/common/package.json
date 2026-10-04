@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc -b",
     "dev": "tsc -b -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "pnpm run build && node --test test/*.test.mjs"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*"

@@ -1,0 +1,54 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import jwt from "jsonwebtoken";
+
+process.env.JWT_SECRET = "test-jwt-secret-that-is-long-enough-for-validation";
+process.env.OAUTH_BACKEND_SHARED_SECRET = "test-oauth-secret-that-is-long-enough-for-validation";
+process.env.ALLOWED_ORIGINS = "http://localhost:3000";
+
+const auth = await import("../dist/auth.js");
+const config = await import("../dist/config.js");
+
+test("missing JWT secret is rejected", () => {
+    const original = process.env.JWT_SECRET;
+    delete process.env.JWT_SECRET;
+    assert.throws(() => config.getJwtSecret(), /JWT_SECRET/);
+    process.env.JWT_SECRET = original;
+});
+
+test("expired and tampered access tokens are rejected", () => {
+    const expired = jwt.sign({ userId: "user-1" }, process.env.JWT_SECRET, { expiresIn: -1 });
+    const valid = auth.signAccessToken("user-1");
+    const tampered = `${valid.slice(0, -1)}${valid.endsWith("a") ? "b" : "a"}`;
+    assert.equal(auth.checkUser(expired), null);
+    assert.equal(auth.checkUser(tampered), null);
+});
+
+test("forged OAuth assertions cannot establish an identity", () => {
+    const forged = jwt.sign(
+        { provider: "google", providerId: "victim-provider-id", email: "victim@example.test" },
+        "attacker-controlled-secret-that-is-long-enough",
+        { issuer: "flowforge-nextauth", audience: "flowforge-http-backend" },
+    );
+    assert.equal(auth.verifyOAuthAssertion(forged), null);
+});
+
+test("OAuth assertions are short-lived, signed, and provider-restricted", () => {
+    const valid = auth.createOAuthAssertion({ provider: "github", providerId: "123", email: null, name: "Test" });
+    assert.deepEqual(auth.verifyOAuthAssertion(valid), { provider: "github", providerId: "123", email: null, name: "Test" });
+});
+
+test("origin configuration rejects absent and malformed origins", () => {
+    const original = process.env.ALLOWED_ORIGINS;
+    delete process.env.ALLOWED_ORIGINS;
+    assert.throws(() => config.getAllowedOrigins(), /ALLOWED_ORIGINS/);
+    process.env.ALLOWED_ORIGINS = "not-an-origin";
+    assert.throws(() => config.getAllowedOrigins(), /ALLOWED_ORIGINS/);
+    process.env.ALLOWED_ORIGINS = original;
+});
+
+test("WebSocket origin policy rejects unconfigured origins", () => {
+    assert.equal(config.isAllowedOrigin("http://localhost:3000"), true);
+    assert.equal(config.isAllowedOrigin("https://attacker.example"), false);
+    assert.equal(config.isAllowedOrigin(undefined), false);
+});

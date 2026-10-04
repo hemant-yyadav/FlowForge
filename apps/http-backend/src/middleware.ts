@@ -5,7 +5,7 @@ export function middleware(req: Request, res: Response, next: NextFunction) {
     const token = (req.headers["authorization"] ?? "").replace("Bearer ", "");
     const userId = checkUser(token);
     if (!userId) {
-        res.status(403).json({ message: "Unauthorized" });
+        res.status(401).json({ message: "Unauthorized" });
         return;
     }
     req.userId = userId;

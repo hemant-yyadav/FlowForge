@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { CreateUserSchema, SigninSchema } from "@repo/common/src/types";
 import { prismaClient } from "db";
-import { JWT_SECRET } from "@repo/backend-common/config";
+import { signAccessToken, verifyOAuthAssertion } from "@repo/backend-common/auth";
 
 export async function signup(req: Request, res: Response) {
     const parsedData = CreateUserSchema.safeParse(req.body);
@@ -48,19 +47,20 @@ export async function signin(req: Request, res: Response) {
         res.status(403).json({ message: "Invalid credentials" });
         return;
     }
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    const token = signAccessToken(user.id);
     res.json({ token });
 }
 
 export async function oauthSignin(req: Request, res: Response) {
-    // This endpoint should only be called securely from the Next.js API route
-    // after successful OAuth verification.
-    const { email, name, provider, providerId } = req.body;
-
-    if (!provider || !providerId) {
-        res.status(400).json({ message: "Missing required OAuth fields" });
+    const assertion = typeof req.body?.assertion === "string" ? req.body.assertion : "";
+    const verifiedIdentity = verifyOAuthAssertion(assertion);
+    if (!verifiedIdentity) {
+        // Never trust provider identities supplied directly by a browser/client.
+        res.status(401).json({ message: "Invalid OAuth assertion" });
         return;
     }
+
+    const { email, name, provider, providerId } = verifiedIdentity;
 
     try {
         let user = null;
@@ -82,7 +82,8 @@ export async function oauthSignin(req: Request, res: Response) {
             const randomSuffix = Math.floor(Math.random() * 1000000).toString();
             // Name could also be null if not set on GitHub
             const safeName = name || "OAuth User";
-            const generatedUsername = `${safeName.split(' ')[0].toLowerCase()}_${randomSuffix}`;
+            const usernameBase = safeName.split(" ")[0] || "oauth";
+            const generatedUsername = `${usernameBase.toLowerCase()}_${randomSuffix}`;
             
             user = await prismaClient.user.create({
                 data: {
@@ -101,10 +102,10 @@ export async function oauthSignin(req: Request, res: Response) {
             });
         }
 
-        const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+        const token = signAccessToken(user.id);
         res.json({ token, userId: user.id });
     } catch (error) {
-        console.error("OAuth signin error:", error);
+        console.error("OAuth signin failed");
         res.status(500).json({ message: "Internal server error" });
     }
 }

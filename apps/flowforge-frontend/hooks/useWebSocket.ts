@@ -18,17 +18,19 @@ export function useWebSocket(token: string | null, roomId: string) {
     useEffect(() => {
         if (!token || !roomId) return;
 
-        const ws = new WebSocket(`${WS_URL}?token=${token}`);
+        const ws = new WebSocket(WS_URL);
         wsRef.current = ws;
 
         ws.onopen = () => {
             setConnected(true);
-            ws.send(JSON.stringify({ type: "join_room", roomId }));
+            ws.send(JSON.stringify({ type: "authenticate", token }));
         };
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            if (data.type === "error") {
+            if (data.type === "authenticated") {
+                ws.send(JSON.stringify({ type: "join_room", roomId }));
+            } else if (data.type === "error") {
                 setError(data.message);
                 ws.close();
             } else if (data.type === "chat") {

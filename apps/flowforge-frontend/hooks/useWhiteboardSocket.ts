@@ -13,15 +13,23 @@ export function useWhiteboardSocket(roomId: string, token: string | null) {
     useEffect(() => {
         if (!token || !roomId) return;
 
-        const ws = new WebSocket(`${WS_URL}?token=${token}`);
+        const ws = new WebSocket(WS_URL);
 
         ws.onopen = () => {
             setConnected(true);
-            ws.send(JSON.stringify({ type: "join_room", roomId }));
+            // Keep the bearer token out of URLs, which are routinely logged by
+            // browsers, proxies, and servers. The server requires this frame
+            // before it accepts any room action.
+            ws.send(JSON.stringify({ type: "authenticate", token }));
         };
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
+
+            if (data.type === "authenticated") {
+                ws.send(JSON.stringify({ type: "join_room", roomId }));
+                return;
+            }
             
             if (data.type === "chat") {
                 setChats((prev) => [...prev, { message: data.message, userId: data.senderName || data.userId, id: Math.random().toString() }]);
