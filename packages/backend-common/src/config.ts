@@ -1,5 +1,16 @@
 const MIN_SECRET_LENGTH = 32;
 
+function configuredUrl(name: string, fallback: string, protocols: string[]): string {
+    const value = process.env[name] || fallback;
+    try {
+        const url = new URL(value);
+        if (!protocols.includes(url.protocol)) throw new Error();
+        return url.toString().replace(/\/$/, "");
+    } catch {
+        throw new Error(`${name} must be an absolute ${protocols.join(" or ")} URL`);
+    }
+}
+
 function requiredSecret(name: "JWT_SECRET" | "OAUTH_BACKEND_SHARED_SECRET"): string {
     const value = process.env[name];
     if (!value || value.length < MIN_SECRET_LENGTH) {
@@ -41,6 +52,10 @@ export function getAllowedOrigins(): string[] {
         throw new Error("ALLOWED_ORIGINS must be a comma-separated list of absolute origins");
     }
     return origins;
+}
+
+export function getHttpBackendUrl(): string {
+    return configuredUrl("HTTP_BACKEND_URL", "http://localhost:3001", ["http:", "https:"]);
 }
 
 export function isAllowedOrigin(origin: string | undefined): boolean {

@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import { useWorkspaces } from "../../hooks/useWorkspaces";
+import { HTTP_URL } from "../../config";
 import { User, Users } from "lucide-react";
 import { ProfileDropdown } from "../../components/workspace/ProfileDropdown";
 
@@ -45,7 +46,7 @@ function WorkspacesContent() {
         if (!newName.trim() || isSubmitting) return;
         setIsSubmitting(true);
         try {
-            const res = await fetch("http://localhost:3001/api/v1/workspaces", {
+            const res = await fetch(`${HTTP_URL}/api/v1/workspaces`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                 body: JSON.stringify({ name: newName.trim(), description: newDesc.trim() })

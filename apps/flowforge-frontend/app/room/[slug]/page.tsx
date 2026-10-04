@@ -49,7 +49,7 @@ function RoomCanvasInner() {
         setToken(storedToken);
 
         // Fetch initial shapes from HTTP backend
-        fetch(`http://localhost:3001/room/${slug}/shapes`, {
+        fetch(`${HTTP_URL}/room/${slug}/shapes`, {
             headers: { "Authorization": `Bearer ${storedToken}` }
         })
         .then(async (res) => {

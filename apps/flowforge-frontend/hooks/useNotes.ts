@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as api from "../lib/notes-api";
+import { HTTP_URL } from "../config";
 
 export function useNotes(workspaceId: string | null, token: string | null) {
     return useQuery({
@@ -92,7 +93,7 @@ export function useCreateWorkspaceRoom(workspaceId: string | null, token: string
     const qc = useQueryClient();
     return useMutation({
         mutationFn: async (name: string) => {
-            const res = await fetch("http://localhost:3001/room", {
+            const res = await fetch(`${HTTP_URL}/room`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -124,7 +125,7 @@ export function useUpdateNote(noteId: string | null, token: string | null) {
 export function useDeleteWorkspaceRoom(workspaceId: string | null, token: string | null) {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (roomId: number) => fetch(`http://localhost:3001/room/${roomId}`, {
+        mutationFn: (roomId: number) => fetch(`${HTTP_URL}/room/${roomId}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`

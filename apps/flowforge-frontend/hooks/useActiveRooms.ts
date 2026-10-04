@@ -1,12 +1,13 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import { ACTIVE_ROOMS_URL } from "../config";
 
 export function useActiveRooms() {
     return useQuery({
         queryKey: ["activeRooms"],
         queryFn: async () => {
             try {
-                const res = await fetch("http://localhost:8080/api/active-rooms");
+                const res = await fetch(ACTIVE_ROOMS_URL);
                 if (!res.ok) return [];
                 const data = await res.json();
                 return data.activeRooms || [];

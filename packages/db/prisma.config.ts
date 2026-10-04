@@ -7,6 +7,10 @@ import { defineConfig } from "prisma/config";
 // repository-root .env. Keep both paths aligned.
 config({ path: path.resolve(__dirname, "../../.env") });
 
+if (!process.env["DATABASE_URL"]) {
+  throw new Error("DATABASE_URL must be set in the repository-root .env file");
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {

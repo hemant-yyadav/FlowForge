@@ -1,3 +1,10 @@
+import { config } from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const appDirectory = path.dirname(fileURLToPath(import.meta.url));
+config({ path: path.resolve(appDirectory, "../../.env") });
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {};
 

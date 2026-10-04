@@ -52,3 +52,25 @@ test("WebSocket origin policy rejects unconfigured origins", () => {
     assert.equal(config.isAllowedOrigin("https://attacker.example"), false);
     assert.equal(config.isAllowedOrigin(undefined), false);
 });
+
+test("multiple origins and a non-local backend URL are supported", () => {
+    const originalOrigins = process.env.ALLOWED_ORIGINS;
+    const originalBackendUrl = process.env.HTTP_BACKEND_URL;
+    process.env.ALLOWED_ORIGINS = "https://app.example.test, https://admin.example.test";
+    process.env.HTTP_BACKEND_URL = "https://api.example.test/";
+
+    assert.deepEqual(config.getAllowedOrigins(), ["https://app.example.test", "https://admin.example.test"]);
+    assert.equal(config.isAllowedOrigin("https://admin.example.test"), true);
+    assert.equal(config.isAllowedOrigin("https://attacker.example.test"), false);
+    assert.equal(config.getHttpBackendUrl(), "https://api.example.test");
+
+    process.env.ALLOWED_ORIGINS = originalOrigins;
+    process.env.HTTP_BACKEND_URL = originalBackendUrl;
+});
+
+test("invalid configured backend URLs fail clearly", () => {
+    const original = process.env.HTTP_BACKEND_URL;
+    process.env.HTTP_BACKEND_URL = "not-a-url";
+    assert.throws(() => config.getHttpBackendUrl(), /HTTP_BACKEND_URL/);
+    process.env.HTTP_BACKEND_URL = original;
+});

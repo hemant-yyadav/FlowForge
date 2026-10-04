@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { createOAuthAssertion } from "@repo/backend-common/auth";
+import { getHttpBackendUrl } from "@repo/backend-common/config";
 
 const handler = NextAuth({
     providers: [
@@ -30,7 +31,7 @@ const handler = NextAuth({
                         provider: account.provider,
                         providerId: account.providerAccountId,
                     });
-                    const backendUrl = process.env.HTTP_BACKEND_URL || "http://localhost:3001";
+                    const backendUrl = getHttpBackendUrl();
                     const res = await fetch(`${backendUrl}/oauth`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },

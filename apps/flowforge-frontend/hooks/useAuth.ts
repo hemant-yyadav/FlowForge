@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { HTTP_URL } from "../config";
 
 export function useAuth() {
     const router = useRouter();
@@ -17,7 +18,7 @@ export function useAuth() {
         } else {
             setToken(t);
             // Fetch user profile from backend to get name and username
-            fetch("http://localhost:3001/me", {
+            fetch(`${HTTP_URL}/me`, {
                 headers: { "Authorization": `Bearer ${t}` }
             })
             .then(res => res.json())
